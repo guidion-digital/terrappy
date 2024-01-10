@@ -47,4 +47,4 @@ There are currently three application types supported:
 
 - [CDN](https://github.com/GuidionOps/terraform-aws-app-cdn-cf-s3): Deploys Cloudfront backed by S3. Handles domains, certificates, artifact updates. Corresponds to the `app_type` "cdn"
 - [Container](https://github.com/GuidionOps/terraform-aws-app-container): Manages the deployment of AWS ECS containers. Corresponds to the `app_type` "container"
-- [API Lambda](https://github.com/GuidionOps/terraform-aws-app-api-lambda): Deploys API Gateways backed by Lambdas. Handles domains, certificates, firewall, CloudWatch events (schedule, and patter), SQS, DynamoDB, with more supporting services coming as the need arises. Corresponds to the `app_type` "api"
+- [API Lambda](https://github.com/GuidionOps/terraform-aws-app-api-lambda): Deploys API Gateways backed by Lambdas. Handles domains, certificates, firewall, CloudWatch events (schedule, and pattern), SQS, DynamoDB, with more supporting services coming as the need arises. Corresponds to the `app_type` "api"
