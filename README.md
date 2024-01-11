@@ -1,3 +1,7 @@
+N.B. Terrappy consists of many interdependent modules, and Guidion is still in the process of open sourcing them. This notice will be removed once the minimum dependency requirements are met, until then the ones that _are_ already available will not be of much use by themselves.
+
+---
+
 # Do You Need Terrappy? (Rationale)
 
 If you want to manage your infrastructure and application deployments all with the same tooling, but keep degrees of separation for security and logical areas of responsibility, this may be the pseudo-framework for you. It was inspired by the [serverless.tf](https://serverless.tf/) project, but aims to make things even easier with further abstractions.
