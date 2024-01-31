@@ -26,8 +26,8 @@ The `infra` modules set up Terraform Cloud workspaces (or pseudo-TFC workspaces 
 
 The [infra-workspaces](https://github.com/GuidionOps/terraform-tfe-infra-workspaces/) module creates a workspace for each `var.applications{}` entry, with:
 
-- An AWS user with a set of permissions to create resources based on the selected `var.applications{}.app_type` selected
-- An IAM role named after each application in that map, to pass to that application's services (more on this below)
+- An AWS user with a set of permissions to create resources based on the selected `var.applications{}.app_type` selected — and only those permissions
+- An IAM role named after each application in that map, to pass to that application's services (more on this below). Only this role and other explicitly given are allowed to be passed via `iam:PassRole` (more on this below)
 - TFC variables needed for the application modules to use
 - All the configuration necessary for a (by default) API driven TFC workspace strategy
 
@@ -43,7 +43,7 @@ The way in which permissions are assigned to an application is flexible. In orde
 - Provide _predefined_ policies in `var.applications{}.application_policy_arns`
 - Create roles with the required policies attached, and pass their names down via environment variables to the application that is to run in the workspace
 
-In all cases the `var.applications{}.application_role_arn_names` list must contain roles that the services will assume, and the service type must be in the `var.applications{}.service_types` list. Only these roles (and those services) will be allowed to be allowed to be passed by the workspace user to the service. This isn't a concern when only using `var.applications{}.application_policy`, since the role that ends up in is automatically added to the list.
+In all cases the `var.applications{}.application_role_arn_names` list must contain roles that the services will assume, and the service type must be in the `var.applications{}.service_types` list. Only these roles will be allowed to be passed by the workspace user to the service, and only the services listed in them allowed to assume them. This isn't a concern when only using `var.applications{}.application_policy`, since the role that ends up in is automatically added to the list.
 
 ## Application Modules
 
