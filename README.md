@@ -12,7 +12,7 @@ The Serverless.tf project provides building blocks for deploying applications in
 
 From there, it makes opinionated decisions on the components to use, and how to put them together.
 
-## How Does it Work?
+# How Does it Work?
 
 There are three types of Terraform module in Terrappy:
 
@@ -22,32 +22,17 @@ There are three types of Terraform module in Terrappy:
 
 The `infra` modules set up Terraform Cloud workspaces (or pseudo-TFC workspaces which actually use S3 and DynamoDB to mimic TFC workspace functionality). Infra level modules create resources that application modules do not have permissions to create, and pass down names and ARNs to them to pick up and use. This includes IAM roles for services (such as Lambdas) to use.
 
-### Workspaces
+## Workspaces
 
-The [infra-workspaces](https://github.com/GuidionOps/terraform-tfe-infra-workspaces/) module creates a workspace for each `var.applications{}` entry, with:
+The [infra-workspaces](https://github.com/GuidionOps/terraform-tfe-infra-workspaces/) module creates a workspace for each `var.applications{}` entry. Utilising the [Permissions](./permissions.md) system, IAM roles and policies are created which give each workspace only the permissions it needs in order to deploy it's application. See the [Workspaces section in the Permissions](./permissions.md#workspaces) page for details on how this works.
 
-- An AWS user with a set of permissions to create resources based on the selected `var.applications{}.app_type` selected — and only those permissions
-- An IAM role named after each application in that map, to pass to that application's services (more on this below). Only this role and other explicitly given are allowed to be passed via `iam:PassRole` (more on this below)
-- TFC variables needed for the application modules to use
-- All the configuration necessary for a (by default) API driven TFC workspace strategy
+## Application Permission System
 
-You'll notice that `var.applications{}.app_type` is not available for the pseudo-workspace created by the [infra-s3-workspaces](https://github.com/GuidionOps/terraform-aws-infra-s3-workspaces/) module. This is because that module does not create an IAM user (and therefore can not be responsible for it's permissions). It is presumed that that module will be used with a pre-existing IAM user.
-
-The infra-s3-workspaces module was created to be used with "development" environments, whereas the infra-workspaces module was designed for "production" environments. There is nothing stopping you from using either for either though. Bear in mind however, that you will always need to supply your own IAM user for the S3 version.
-
-### Permissions System
-
-The way in which permissions are assigned to an application is flexible. In order to provide application permissions, you may:
-
-- Provide a raw policy to `var.applications{}.application_policy`. This will be added to the default role created for the application, and available by default to a variable created called `var.role_arn`
-- Provide _predefined_ policies in `var.applications{}.application_policy_arns`
-- Create roles with the required policies attached, and pass their names down via environment variables to the application that is to run in the workspace
-
-In all cases the `var.applications{}.application_role_arn_names` list must contain roles that the services will assume, and the service type must be in the `var.applications{}.service_types` list. Only these roles will be allowed to be passed by the workspace user to the service, and only the services listed in them allowed to assume them. This isn't a concern when only using `var.applications{}.application_policy`, since the role that ends up in is automatically added to the list.
+The workspaces dish out permissions to the resources they create (e.g. Lambdas). The way in which permissions are assigned is flexible. See [Permissions](./permissions.md#applications) for how this works.
 
 ## Application Modules
 
-There are currently three application types supported:
+Finally, we have the application modules which are the ultimate point for all the resources created by the modules above. There are currently three application types supported:
 
 - [CDN](https://github.com/GuidionOps/terraform-aws-app-cdn-cf-s3): Deploys Cloudfront backed by S3. Handles domains, certificates, artifact updates. Corresponds to the `app_type` "cdn"
 - [Container](https://github.com/GuidionOps/terraform-aws-app-container): Manages the deployment of AWS ECS containers. Corresponds to the `app_type` "container"
