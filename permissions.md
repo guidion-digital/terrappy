@@ -7,7 +7,7 @@ Each application workspace created by the [workspace module](https://github.com/
 - TFC variables needed for the application modules to use
 - All the configuration necessary for a (by default) API driven TFC workspace strategy
 
-You'll notice that `var.applications{}.app_type` is not available for the pseudo-workspace created by the [infra-s3-workspaces](TODO: Coming soon) module. This is because that module does not create an IAM user (and therefore can not be responsible for it's permissions). It is presumed that that module will be used with a pre-existing IAM user by developers directly on their machines.
+You'll notice that `var.applications{}.app_type` is not available for the pseudo-workspace created by the [infra-s3-workspaces](https://github.com/guidion-digital/terraform-aws-infra-s3-workspaces) module. This is because that module does not create an IAM user (and therefore can not be responsible for it's permissions). It is presumed that that module will be used with a pre-existing IAM user by developers directly on their machines.
 
 The infra-s3-workspaces module was created to be used with "development" environments, whereas the infra-workspaces module was designed for "production" environments, and CI/CD. There is nothing stopping you from using either for either though. Bear in mind however, that you will always need to supply your own IAM user for the S3 version.
 
@@ -22,7 +22,7 @@ In order to add more permissions to the default role, you may:
 - Provide a raw policy to `var.applications{}.application_policy`. This will be added to the default role created for the application, and available by default to a variable created called `var.role_arn`
 - Provide _predefined_ policies in `var.applications{}.application_policy_arns`
 
-The ARN of the default role is provided in a variable called `var.role_arn`, available in both the [S3 version of the workspace module](FIXME: Coming soon), and the [TFC version](https://github.com/guidion-digital/terraform-tfe-infra-workspaces).
+The ARN of the default role is provided in a variable called `var.role_arn`, available in both the [S3 version of the workspace module](https://github.com/guidion-digital/terraform-aws-infra-s3-workspaces), and the [TFC version](https://github.com/guidion-digital/terraform-tfe-infra-workspaces).
 
 ## Using Roles Other than the Default Role
 
