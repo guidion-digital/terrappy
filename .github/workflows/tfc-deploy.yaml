@@ -41,7 +41,7 @@ jobs:
       - name: Upload Terraform files and build
         uses: actions/upload-artifact@v4
         with:
-          name: build-and-terraform
+          name: build-and-terraform-full
           path: |
             ${{ inputs.source_dir }}
             *.tf
@@ -57,7 +57,7 @@ jobs:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
-          name: build-and-terraform
+          name: build-and-terraform-full
       - name: plan
         run: |
           TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{secrets.tfc_api_token}} TF_WORKSPACE=${{inputs.workspace}} terraform plan
@@ -75,6 +75,6 @@ jobs:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
-          name: build-and-terraform
+          name: build-and-terraform-full
       - name: Run terraform apply with auto-approval
         run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{secrets.tfc_api_token}} TF_WORKSPACE=${{inputs.workspace}} terraform apply -auto-approve
