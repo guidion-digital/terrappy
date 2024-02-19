@@ -40,8 +40,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-and-terraform
+      - name: Add backend.tf
+        run: |
+          echo "terraform {
+            cloud {
+              organization = \"${{ inputs.organization }}\"
+            }
+          }" > backend.tf
       - name: init
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{secrets.tfc_api_token}} TF_ORGANIZATION=${{ inputs.organization }} TF_WORKSPACE=${{inputs.workspace}} terraform init
+        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{secrets.tfc_api_token}} TF_WORKSPACE=${{inputs.workspace}} terraform init
       - name: Upload Terraform files and build
         uses: actions/upload-artifact@v4
         with:
@@ -64,7 +71,7 @@ jobs:
           name: build-and-terraform-full
       - name: plan
         run: |
-          TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{secrets.tfc_api_token}} TF_ORGANIZATION=${{ inputs.organization }} TF_WORKSPACE=${{inputs.workspace}} terraform plan
+          TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{secrets.tfc_api_token}} TF_WORKSPACE=${{inputs.workspace}} terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
       - uses: trstringer/manual-approval@v1
         with:
@@ -81,4 +88,4 @@ jobs:
         with:
           name: build-and-terraform-full
       - name: Run terraform apply with auto-approval
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{secrets.tfc_api_token}} TF_ORGANIZATION=${{ inputs.organization }} TF_WORKSPACE=${{inputs.workspace}} terraform apply -auto-approve
+        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{secrets.tfc_api_token}} TF_WORKSPACE=${{inputs.workspace}} terraform apply -auto-approve
