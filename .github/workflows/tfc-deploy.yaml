@@ -18,6 +18,11 @@ on:
         required: false
         type: string
         default: dist
+      retention-days:
+        description: How long to store artifacts
+        required: false
+        type: number
+        default: 2
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
@@ -58,6 +63,7 @@ jobs:
             *.tf
             .terraform
             .terraform.lock.hcl
+          retention-days: ${{ inputs.retention-days }}
 
   tf-plan:
     needs: tf-init
