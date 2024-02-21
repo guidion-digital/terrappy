@@ -44,7 +44,7 @@ Finally, we have the application modules which are the ultimate point for all th
 
 [TFCD](https://github.com/GuidionOps/terraform-cloud-deployer) is a CLI utility designed to provide low-level commands to TFC. It was used in the first iteration of Terrappy, before migrating to `terraform` commands, but is still used by the Terrappy Github workflow (see below) for it's `cancel` command.
 
-The [Terrappy Github workflow](https://github.com/guidion-digital/terrappy/blob/beta/.github/workflows/tfc-deploy.yaml) exists as a convenience for integrating into your own workflows. You can use it like this:
+The [Terrappy Github workflow](https://github.com/guidion-digital/terrappy/blob/beta/.github/workflows/tfc-deploy.yaml) can be integrated into your own workflows. You can use it like this:
 
 ```yaml
 jobs:
