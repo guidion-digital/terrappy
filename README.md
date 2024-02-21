@@ -37,3 +37,35 @@ Finally, we have the application modules which are the ultimate point for all th
 - [CDN](https://github.com/GuidionOps/terraform-aws-app-cdn-cf-s3): Deploys Cloudfront backed by S3. Handles domains, certificates, artifact updates. Corresponds to the `app_type` "cdn"
 - [Container](https://github.com/GuidionOps/terraform-aws-app-container): Manages the deployment of AWS ECS containers. Corresponds to the `app_type` "container"
 - [API Lambda](https://github.com/GuidionOps/terraform-aws-app-api-lambda): Deploys API Gateways backed by Lambdas. Handles domains, certificates, firewall, CloudWatch events (schedule, and pattern), SQS, DynamoDB, with more supporting services coming as the need arises. Corresponds to the `app_type` "api"
+
+---
+
+# Utilities
+
+[TFCD](https://github.com/GuidionOps/terraform-cloud-deployer) is a CLI utility designed to provide low-level commands to TFC. It was used in the first iteration of Terrappy, before migrating to `terraform` commands, but is still used by the Terrappy Github workflow (see below) for it's `cancel` command.
+
+The [Terrappy Github workflow](https://github.com/guidion-digital/terrappy/blob/beta/.github/workflows/tfc-deploy.yaml) exists as a convenience for integrating into your own workflows. You can use it like this:
+
+```yaml
+jobs:
+  ...
+
+  deploy_prod:
+    needs: build_and_test
+    permissions:
+      issues: write
+      contents: read
+      pull-requests: write
+    uses: guidion-digital/terrappy/.github/workflows/tfc-deploy.yaml@beta0.0.6
+    with:
+      organization: guidion
+      workspace: FILL ME IN
+      approvers: FILL ME IN
+      source_dir: FILL ME IN
+    secrets:
+      tfc_api_token: ${{ secrets.TFC_API_TOKEN_PROD }}
+
+  ...
+```
+
+Currently it will display a Terraform plan that needs to be approved (via an automatically created Github issue) on the `master` branch. This however, is not final and may change.
