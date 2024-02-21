@@ -51,7 +51,6 @@ jobs:
   ...
 
   deploy_prod:
-    needs: build_and_test
     permissions:
       issues: write
       contents: read
