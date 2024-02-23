@@ -55,11 +55,11 @@ jobs:
       issues: write
       contents: read
       pull-requests: write
-    uses: guidion-digital/terrappy/.github/workflows/tfc-deploy.yaml@beta0.0.7
+    uses: guidion-digital/terrappy/.github/workflows/tfc-deploy.yaml@beta0.0.8
     with:
       organization: guidion
       workspace: FILL ME IN
-      approvers: FILL ME IN
+      approvers: FILL ME IN (if you want the job to pause for approval)
       source_dir: FILL ME IN
     secrets:
       tfc_api_token: ${{ secrets.TFC_API_TOKEN_PROD }}

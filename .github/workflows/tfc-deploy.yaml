@@ -10,9 +10,10 @@ on:
         required: true
         type: string
       approvers:
-        description: CSV of people allowed to approve this plan
-        required: true
+        description: CSV of people allowed to approve this plan. Will pause the workflow for plan approval if provided
+        required: false
         type: string
+        default: ''
       source_dir:
         description: Name of the directory holding the source to be deployed
         required: false
@@ -69,7 +70,7 @@ jobs:
     needs: tf-init
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
-    if: github.ref == 'refs/heads/master'
+    if: ${{ inputs.approvers != null }}
     permissions:
       issues: write
     steps:
