@@ -42,29 +42,10 @@ Finally, we have the application modules which are the ultimate point for all th
 
 # Utilities
 
-[TFCD](https://github.com/GuidionOps/terraform-cloud-deployer) is a CLI utility designed to provide low-level commands to TFC. It was used in the first iteration of Terrappy, before migrating to `terraform` commands, but is still used by the Terrappy Github workflow (see below) for it's `cancel` command.
+[TFCD](https://github.com/GuidionOps/terraform-cloud-deployer) is a CLI utility designed to provide low-level commands to TFC. It was used in the first iteration of Terrappy, before migrating to `terraform` commands, but is still used by the Terrappy Github workflow (see below) for it's `cancel` command — though this will be unecessary in a future version.
 
-The [Terrappy Github workflow](https://github.com/guidion-digital/terrappy/blob/beta/.github/workflows/tfc-deploy.yaml) can be integrated into your own workflows. You can use it like this:
+## CICD
 
-```yaml
-jobs:
-  ...
+There is a reusable [Github Actions workflow](./cicd.md) which you can plug into your existing workflows.
 
-  deploy_prod:
-    permissions:
-      issues: write
-      contents: read
-      pull-requests: write
-    uses: guidion-digital/terrappy/.github/workflows/tfc-deploy.yaml@beta0.0.8
-    with:
-      organization: guidion
-      workspace: FILL ME IN
-      approvers: FILL ME IN (if you want the job to pause for approval)
-      source_dir: FILL ME IN
-    secrets:
-      tfc_api_token: ${{ secrets.TFC_API_TOKEN_PROD }}
-
-  ...
-```
-
-Currently it will display a Terraform plan that needs to be approved (via an automatically created Github issue) on the `master` branch. This however, is not final and may change.
+If you are using Circle CI, there is also an [Orb](https://github.com/GuidionOps/terraform-cloud-deployer?tab=readme-ov-file#circle-ci-orb) you can use.
