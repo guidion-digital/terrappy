@@ -40,14 +40,20 @@ on:
         required: false
 
 jobs:
-  cancel:
+  variable_show:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
     steps:
-      - name: cancel
-        run: tfcd -t ${{ secrets.tfc_api_token }} -w ${{ vars.workspace || inputs.workspace }} run cancel --auto-approve current
-
+      - name: Show variables
+        run: "secret=${{ vars.tfc_api_token }} workspace=${{ vars.workspace }}"
+  # cancel:
+  #   runs-on: ubuntu-latest
+  #   environment: ${{ inputs.environment_name }}
+  #   container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+  #   steps:
+  #     - name: cancel
+  #       run: tfcd -t ${{ secrets.tfc_api_token }} -w ${{ vars.workspace || inputs.workspace }} run cancel --auto-approve current
+  #
   # tf-init:
   #   needs: cancel
   #   runs-on: ubuntu-latest
