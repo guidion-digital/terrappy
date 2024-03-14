@@ -37,11 +37,12 @@ on:
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
-        required: false
+        required: true
 
 jobs:
   cancel:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
     steps:
       - name: cancel
