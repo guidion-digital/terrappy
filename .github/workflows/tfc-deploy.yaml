@@ -11,7 +11,7 @@ on:
         type: string
       workspace:
         description: Name of the TFC workspace we're using
-        required: true
+        required: false
         type: string
       approvers:
         description: CSV of people allowed to approve this plan. Will pause the workflow for plan approval if provided
@@ -44,7 +44,7 @@ jobs:
     environment: ${{ inputs.environment_name }}
     steps:
       - name: Show variables
-        run: echo "env=${{ inputs.environment_name }} workspace=${{ vars.WORKSPACE }}"
+        run: echo "env=${{ inputs.environment_name }} workspace=${{ vars.WORKSPACE || inputs.workspace }}"
 
   # cancel:
   #   runs-on: ubuntu-latest
