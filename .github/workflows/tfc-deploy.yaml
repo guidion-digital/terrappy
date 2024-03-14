@@ -37,7 +37,7 @@ on:
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
-        required: false
+        required: true
 
 jobs:
   variable_show:
