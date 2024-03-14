@@ -5,6 +5,7 @@ on:
         description: The Github environment containing all the variables needed
         required: false
         type: string
+        default: ''
       organization:
         description: Name of the TFC organization you're deploying to
         required: true
@@ -39,19 +40,12 @@ on:
         required: true
 
 jobs:
-  show_variables:
+  cancel:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment_name }}
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
     steps:
-      - name: Show variables
-        run: echo "env=${{ inputs.environment_name }} workspace=${{ vars.WORKSPACE || inputs.workspace }}"
-
-  # cancel:
-  #   runs-on: ubuntu-latest
-  #   container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
-  #   steps:
-  #     - name: cancel
-  #       run: tfcd -t ${{ secrets.tfc_api_token }} -w ${{ inputs.workspace }} run cancel --auto-approve current
+      - name: cancel
+        run: tfcd -t ${{ secrets.tfc_api_token }} -w ${{ vars.workspace || inputs.workspace }} run cancel --auto-approve current
 
   # tf-init:
   #   needs: cancel
