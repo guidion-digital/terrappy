@@ -57,7 +57,7 @@ jobs:
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
     steps:
       - name: cancel
-        run: tfcd -t ${{ secrets.tfc_api_token }} -w ${{ vars.workspace || vars.workspace || inputs.workspace }} run cancel --auto-approve current
+        run: tfcd -t ${{ secrets.tfc_api_token }} -w ${{ inputs.workspace || vars.workspace }} run cancel --auto-approve current
 
   tf-init:
     needs: cancel
@@ -68,33 +68,33 @@ jobs:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
-          name: ${{ vars.artifact || inputs.artifact-name }}
+          name: ${{ inputs.artifact || vars.artifact-name }}
       - name: Add backend.tf
         run: |
           echo "terraform {
             cloud {
-              organization = \"${{ vars.organization || inputs.organization }}\"
+              organization = \"${{ inputs.organization || vars.organization }}\"
             }
           }" > backend.tf
       - name: init
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ vars.workspace || inputs.workspace }} terraform init
+        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.workspace || vars.workspace }} terraform init
       - name: Upload Terraform files and build
         uses: actions/upload-artifact@v4
         with:
           name: build-and-terraform-full
           path: |
-            ${{ vars.source_dir || inputs.source_dir }}
+            ${{ inputs.source_dir || vars.source_dir }}
             *.tf
             .terraform
             .terraform.lock.hcl
-          retention-days: ${{ vars.retention-days || inputs.retention-days }}
+          retention-days: ${{ inputs.retention-days || vars.retention-days }}
 
   tf-plan:
     needs: tf-init
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
-    if: ${{ vars.approvers != null || inputs.approvers != null }}
+    if: ${{ inputs.approvers != null || vars.approvers != null }}
     permissions:
       issues: write
     steps:
@@ -104,12 +104,12 @@ jobs:
           name: build-and-terraform-full
       - name: plan
         run: |
-          TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ vars.workspace || inputs.workspace }} terraform plan
+          TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.workspace || vars.workspace }} terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
       - uses: trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
-          approvers: ${{ vars.approvers || inputs.approvers }}
+          approvers: ${{ inputs.approvers || vars.approvers }}
 
   tf-apply:
     needs: tf-plan
@@ -129,4 +129,4 @@ jobs:
         with:
           name: build-and-terraform-full
       - name: Run terraform apply with auto-approval
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ vars.workspace || inputs.workspace }} terraform apply -auto-approve
+        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.workspace || vars.workspace }} terraform apply -auto-approve
