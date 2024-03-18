@@ -68,7 +68,7 @@ jobs:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.artifact || vars.artifact-name }}
+          name: ${{ inputs.artifact-name || vars.artifact-name }}
       - name: Add backend.tf
         run: |
           echo "terraform {
