@@ -93,23 +93,29 @@ jobs:
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
 
   tf-plan:
+    # We can't use if at this level because of this bug in Github Actions:
+    # https://github.com/orgs/community/discussions/113313
+    # if: ${{ inputs.tfc_approvers != null || vars.tfc_approvers != null }}
+    # So we have to add an 'if' to every step
     needs: tf-init
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
-    if: ${{ inputs.tfc_approvers != null || vars.tfc_approvers != null }}
     permissions:
       issues: write
     steps:
-      - name: Get the build artifacts and Terraform files
+      - if: ${{ inputs.tfc_approvers != null || vars.tfc_approvers != null }}
+        name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
           name: build-and-terraform-full
-      - name: plan
+      - if: ${{ inputs.tfc_approvers != null || vars.tfc_approvers != null }}
+        name: plan
         run: |
           TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
-      - uses: trstringer/manual-approval@v1
+      - if: ${{ inputs.tfc_approvers != null || vars.tfc_approvers != null }}
+        uses: trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
           approvers: ${{ inputs.tfc_approvers || vars.tfc_approvers }}
