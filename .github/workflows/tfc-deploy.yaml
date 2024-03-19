@@ -8,6 +8,9 @@
 #
 # For explicit variable input method, 'tfc_organization', 'tfc_api_token' (secret),
 # 'tfc_workspace', are required, whilst 'environment_name' must not be given
+#
+# If 'tfc_approvers' is present in either the environment or as an input, a plan
+# job is run and the workflow will pause for approval
 
 on:
   workflow_call:
@@ -25,12 +28,12 @@ on:
         description: Name of the TFC workspace we're using
         required: false
         type: string
-      approvers:
+      tfc_approvers:
         description: CSV of people allowed to approve this plan. Will pause the workflow for plan approval if provided
         required: false
         type: string
         default: ''
-      artifact-name:
+      artifact_name:
         description: Name of the workflow artifact containing the build and Terraform files
         required: false
         type: string
@@ -68,7 +71,7 @@ jobs:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.artifact-name || vars.artifact-name }}
+          name: ${{ inputs.artifact_name || vars.artifact_name }}
       - name: Add backend.tf
         run: |
           echo "terraform {
@@ -94,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
-    if: ${{ inputs.approvers != null || vars.approvers != null }}
+    if: ${{ inputs.tfc_approvers != null || vars.tfc_approvers != null }}
     permissions:
       issues: write
     steps:
@@ -109,7 +112,7 @@ jobs:
       - uses: trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
-          approvers: ${{ inputs.approvers || vars.approvers }}
+          approvers: ${{ inputs.tfc_approvers || vars.tfc_approvers }}
 
   tf-apply:
     needs: tf-plan
