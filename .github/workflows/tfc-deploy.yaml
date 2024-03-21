@@ -10,7 +10,8 @@
 # 'tfc_workspace', are required, whilst 'environment_name' must not be given
 #
 # If 'tfc_approvers' is present in either the environment or as an input, a plan
-# job is run and the workflow will pause for approval
+# job is run and that job continues to run until it is approved via an issue
+# comment. This is billable, and times out after 6 hours.
 
 on:
   workflow_call:
