@@ -48,6 +48,11 @@ on:
         required: false
         type: number
         default: 2
+      approval_timeout:
+        description: How long the approval step will wait before timeing out
+        required: false
+        type: number
+        default: 360
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
@@ -114,10 +119,19 @@ jobs:
         run: |
           TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
+      # Nope: https://github.com/trstringer/manual-approval/issues/115
+      # - if: ${{ vars.APPROVERS_APP_ID != null }}
+      #   name: Generate approver token
+      #   id: generate_approver_token
+      #   uses: tibdex/github-app-token@v1
+      #   with:
+      #     app_id: ${{ vars.approvers_app_id }}
+      #     private_key: ${{ secrets.approvers_private_key }}
       - if: ${{ inputs.tfc_approvers != null || vars.tfc_approvers != null }}
         uses: trstringer/manual-approval@v1
+        timeout-minutes: ${{ inputs.approval_timeout || vars.approval_timeout }}
         with:
-          secret: ${{ github.TOKEN }}
+          secret: ${{ steps.generate_approver_token.outputs.token || github.TOKEN }}
           approvers: ${{ inputs.tfc_approvers || vars.tfc_approvers }}
 
   tf-apply:
