@@ -112,14 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
-    if: always()
     steps:
-        # The first step is a bit of a hack. It allows us to have the
-        # conditional plan above, whilst still using 'needs' on this job even if
-        # that conditional job doesn't run
-      - name: Fail if tf-plan failed
-        if: ${{ needs.tf-plan.result == 'failure' }}
-        run: exit 1
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
