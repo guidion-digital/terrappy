@@ -2,12 +2,20 @@
 # required variables, or by passing the variables explicitly as inputs:
 #
 # For environment method:
+#
 #   - Pass the input 'environment_name', being the name of the environment with
 #     the variables
 #   - Pass the secrets by setting 'secrets: inherit' on the calling job
 #
-# For explicit variable input method, 'tfc_organization', 'tfc_api_token' (secret),
-# 'tfc_workspace', are required, whilst 'environment_name' must not be given
+# For either method, the following must be available either via inputs or the
+# environment:
+#
+# - 'tfc_organization'
+# - 'tfc_api_token' (secret),
+# - 'tfc_workspace'
+#
+# If 'environment_name' is supplied, it will win for any values found in both
+# inputs and that environment
 #
 # If 'tfc_approvers' is present in either the environment or as an input, a plan
 # job is run and that job continues to run until it is approved via an issue

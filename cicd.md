@@ -1,4 +1,4 @@
-If you use Github Actions workflows, you can make use of the [Terrappy re-usable workflow](.github/workflows/tfc-deploy.yaml).
+If you use Github Actions workflows, you can make use of the [Terrappy re-usable workflows](.github/workflows/). There are two flavours; one that you can use on any plan, and one that requires a Github Enterprise feature called "deployment approvals".
 
 If you'd like to pass the required variables and secrets via inputs, you can do so like this:
 
@@ -32,6 +32,21 @@ If you use repository environments to control access to secrets and variables, y
     secrets: inherit
 ```
 
-Note that the `acc` environment in the example above must contain the variables `organization` and `workspace`, along with the secret `tfc_api_token`. If you provide both `environment_name` and inputs, the values from the inputs win.
+Note that the `acc` environment in the example above must contain the variables `organization` and `workspace`, along with the secret `tfc_api_token`. If you provide both `environment_name` and inputs, the values from the inputs win. There is one difference in requirements if using the enterprise version of the workflow, which is detailed below.
 
-Currently, if `approvers` is given it will display a Terraform plan that needs to be approved (via an automatically created Github issue). This may change in future as other approval processes are being looked into. Bear in mind that the approval job will continue running for a maximum of 6 hours, until the deployment is approved. The cheapest runner costs $2.88 every 6 hours.
+## Github Free-Plan Approvals
+
+When on a non-enterprise Github plan, you may use [this version of the re-usable workflow](.github/workflows/tfc-deploy.yaml). If `approvers` is provided, it will display a Terraform plan that needs to be approved via an automatically created Github issue. Bear in mind that the approval job will continue running for a maximum of 6 hours, until the deployment is approved. The cheapest runner costs $2.88 every 6 hours.
+
+## Github Enterprise Approvals
+
+Github Enterprise has a the above feature built in, via deployment approvals. You can then use [the enterprise version of the re-usable workflow](.github/workflows/tfc-deploy-enterprise.yaml). The only difference in requirements is:
+
+- `tfc_planner_api_token` must be provided. This token must at minimum have the `plan` permission on the TFC workspace
+- `environment_name` must be provided, containing `tfc_api_token` which has is a TFC token with `apply` permission on the workspace
+
+The Terraform plan is run with the token from `tfc_planner_api_token`, and the apply is run with the token from `tfc_api_token`. If you then set the environment specified in `environment_name` to require approvals from a trusted list, you will have a protected deploy to that environment.
+
+## No Approvals
+
+If you'd prefer to "do it live!" and have no approval process, the enterprise version will still work for you on the free plan (since you will not be able to set approvers). You can also the free version of the workflow, and simply not supply the `approvers` input.
