@@ -6,6 +6,10 @@
 # stage, we make use of an organisation level secret called 'tfc_planner_api_token',
 # which has only the 'plan' permission, but on all workspaces.
 #
+# The following secrets and variables must therefore be available via inputs:
+#
+# FIXME
+#
 # Can be run by either accessing a repository environment containing all the
 # required variables, or by passing the variables explicitly as inputs:
 #
@@ -61,7 +65,10 @@ on:
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
-        required: true
+        required: false
+      tfc_planner_api_token:
+        description: Token used to talk to Terraform Cloud for plans
+        required: false
 
 jobs:
   tf-init:
