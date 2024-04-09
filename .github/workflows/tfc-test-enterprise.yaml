@@ -52,7 +52,7 @@ on:
         description: Name of the directory holding the source to be deployed
         required: false
         type: string
-        default: examples/test_app
+        default: dist
       retention-days:
         description: How long to store artifacts
         required: false
