@@ -48,11 +48,6 @@ on:
         required: false
         type: string
         default: build-and-terraform
-      source_dir:
-        description: Name of the directory holding the source to be deployed
-        required: false
-        type: string
-        default: dist
       retention-days:
         description: How long to store artifacts
         required: false
@@ -94,10 +89,7 @@ jobs:
         with:
           name: build-and-terraform-full
           path: |
-            ${{ inputs.source_dir || vars.source_dir }}
-            *.tf
-            .terraform
-            .terraform.lock.hcl
+            *
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
 
   tf-plan:
