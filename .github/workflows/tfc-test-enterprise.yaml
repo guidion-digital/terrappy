@@ -1,0 +1,128 @@
+# This is version of the workflow is nearly the same as 'tfc-deploy.yaml', save
+# for the fact that it relies on an enterprise feature which allows us to protect
+# the environment (containing the Terraform Cloud token).
+#
+# Can be run by either accessing a repository environment containing all the
+# required variables, or by passing the variables explicitly as inputs:
+#
+# For environment method:
+#
+#   - Pass the input 'environment_name', being the name of the environment with
+#     the variables
+#   - Pass the secrets by setting 'secrets: inherit' on the calling job
+#
+# For either method, the following must be available either via inputs or the
+# environment:
+#
+# - 'tfc_organization'
+# - 'tfc_api_token' (secret),
+# - 'tfc_planner_api_token' (secret)
+# - 'tfc_workspace'
+#
+# If 'environment_name' is supplied, it will win for any values found in both
+# inputs and that environment
+
+on:
+  workflow_call:
+    inputs:
+      environment_name:
+        description: The Github environment containing all the variables needed
+        required: false
+        type: string
+        default: ''
+      tfc_organization:
+        description: Name of the TFC organization you're deploying to
+        required: false
+        type: string
+      tfc_workspace:
+        description: Name of the TFC workspace we're using
+        required: false
+        type: string
+      tfc_approvers:
+        description: CSV of people allowed to approve this plan. Will pause the workflow for plan approval if provided
+        required: false
+        type: string
+        default: ''
+      artifact_name:
+        description: Name of the workflow artifact containing the build and Terraform files
+        required: false
+        type: string
+        default: build-and-terraform
+      source_dir:
+        description: Name of the directory holding the source to be deployed
+        required: false
+        type: string
+        default: examples/test_app
+      retention-days:
+        description: How long to store artifacts
+        required: false
+        type: number
+        default: 2
+      approval_timeout:
+        description: How long the approval step will wait before timeing out
+        required: false
+        type: number
+        default: 360
+    secrets:
+      tfc_api_token:
+        description: Token used to talk to Terraform Cloud
+        required: false
+      tfc_planner_api_token:
+        description: Token used to talk to Terraform Cloud for plans
+        required: true
+
+jobs:
+  tf-init:
+    runs-on: ubuntu-latest
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    steps:
+      - name: Get the build artifacts and Terraform files
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name || vars.artifact_name }}
+      - name: Add backend.tf
+        run: |
+          echo "terraform {
+            cloud {
+              organization = \"${{ inputs.tfc_organization || vars.tfc_organization }}\"
+            }
+          }" > backend.tf
+      - name: init
+        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform init
+      - name: Upload Terraform files and build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-and-terraform-full
+          path: |
+            ${{ inputs.source_dir || vars.source_dir }}
+            *.tf
+            .terraform
+            .terraform.lock.hcl
+          retention-days: ${{ inputs.retention-days || vars.retention-days }}
+
+  tf-plan:
+    needs: tf-init
+    runs-on: ubuntu-latest
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    steps:
+      - name: Get the build artifacts and Terraform files
+        uses: actions/download-artifact@v4
+        with:
+          name: build-and-terraform-full
+      - name: plan
+        run: |
+          TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform plan
+          echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
+
+  # tf-apply:
+  #   needs: tf-plan
+  #   runs-on: ubuntu-latest
+  #   environment: ${{ inputs.environment_name }}
+  #   container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+  #   steps:
+  #     - name: Get the build artifacts and Terraform files
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: build-and-terraform-full
+  #     - name: Run terraform apply with auto-approval
+  #       run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform apply -auto-approve
