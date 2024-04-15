@@ -87,7 +87,7 @@ jobs:
       - name: Upload Terraform files and build
         uses: actions/upload-artifact@v4
         with:
-          name: build-and-terraform-full
+          name: build-and-terraform-full-${{ inputs.environment_name }}
           path: |
             *
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
@@ -100,7 +100,7 @@ jobs:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
-          name: build-and-terraform-full
+          name: build-and-terraform-full-${{ inputs.environment_name }}
       - name: destroy
         run: |
           TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform destroy -auto-approve
