@@ -95,6 +95,7 @@ jobs:
   tf-destroy:
     needs: tf-init
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
     steps:
       - name: Get the build artifacts and Terraform files
