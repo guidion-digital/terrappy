@@ -107,6 +107,7 @@ jobs:
         with:
           name: build-and-terraform-full-${{ inputs.environment_name }}
       - name: destroy
+        working-directory: ./examples/test_app
         run: |
           TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform destroy -auto-approve
 
