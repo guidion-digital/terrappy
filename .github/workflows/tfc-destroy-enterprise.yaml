@@ -70,6 +70,9 @@ jobs:
   tf-init:
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    defaults:
+      run:
+        working-directory: ./examples/test_app
     steps:
   #     - name: Get the build artifacts and Terraform files
   #       uses: actions/download-artifact@v4
