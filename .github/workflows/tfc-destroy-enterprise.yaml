@@ -75,7 +75,7 @@ jobs:
   #       uses: actions/download-artifact@v4
   #       with:
   #         name: ${{ inputs.artifact_name || vars.artifact_name }}
-      - name: Add backend.tf
+      - name: Create folder for init files
         run: mkdir -p examples/test_app
       - name: Add backend.tf
         working-directory: ./examples/test_app
