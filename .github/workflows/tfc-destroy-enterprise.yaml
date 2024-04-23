@@ -43,11 +43,11 @@ on:
         required: false
         type: string
         default: ''
-      artifact_name:
-        description: Name of the workflow artifact containing the build and Terraform files
+      working_directory:
+        description: Name of the folder containing the terraform files to deploy/destroy
         required: false
         type: string
-        default: build-and-terraform
+        default: ./examples/test_app
       retention-days:
         description: How long to store artifacts
         required: false
@@ -71,14 +71,10 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
     steps:
-  #     - name: Get the build artifacts and Terraform files
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: ${{ inputs.artifact_name || vars.artifact_name }}
       - name: Create folder for init files
         run: mkdir -p examples/test_app
       - name: Add backend.tf
-        working-directory: ./examples/test_app
+        working-directory: ${{ inputs.working_directory || vars.working_directory }}
         run: |
           echo "terraform {
             cloud {
@@ -86,7 +82,7 @@ jobs:
             }
           }" > backend.tf
       - name: init
-        working-directory: ./examples/test_app
+        working-directory: ${{ inputs.working_directory || vars.working_directory }}
         run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform init
       - name: Upload Terraform files and build
         uses: actions/upload-artifact@v4
@@ -107,19 +103,6 @@ jobs:
         with:
           name: build-and-terraform-full-${{ inputs.environment_name }}
       - name: destroy
-        working-directory: ./examples/test_app
+        working-directory: ${{ inputs.working_directory || vars.working_directory }}
         run: |
           TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform destroy -auto-approve
-
-  # tf-apply:
-  #   needs: tf-plan
-  #   runs-on: ubuntu-latest
-  #   environment: ${{ inputs.environment_name }}
-  #   container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
-  #   steps:
-  #     - name: Get the build artifacts and Terraform files
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: build-and-terraform-full
-  #     - name: Run terraform apply with auto-approval
-  #       run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform apply -auto-approve
