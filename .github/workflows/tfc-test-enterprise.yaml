@@ -89,7 +89,7 @@ jobs:
         with:
           name: build-and-terraform-full
           path: |
-            **.tf
+            **/*.tf
             .terraform
             .terraform.lock.hcl
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
