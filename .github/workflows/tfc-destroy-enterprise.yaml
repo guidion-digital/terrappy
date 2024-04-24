@@ -89,7 +89,9 @@ jobs:
         with:
           name: build-and-terraform-full-${{ inputs.environment_name }}
           path: |
-            *
+            **/*.tf
+            **/*.terraform
+            **/*.terraform.lock.hcl
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
 
   tf-destroy:
