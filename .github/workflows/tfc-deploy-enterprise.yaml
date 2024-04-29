@@ -144,6 +144,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.20
+    if: always()
     steps:
         # The first step is a bit of a hack. It allows us to have the
         # conditional plan above, whilst still using 'needs' on this job even if
