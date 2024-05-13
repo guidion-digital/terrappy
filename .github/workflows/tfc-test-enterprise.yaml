@@ -104,7 +104,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-and-terraform-full
-      - name: change to test folder
+      - name: debugging
         run: |
           pwd && ls && ls -lah ./.terraform/plugins/linux_amd64/* && chmod -R a+x ./.terraform/plugins/linux_amd64/*
       - name: test
