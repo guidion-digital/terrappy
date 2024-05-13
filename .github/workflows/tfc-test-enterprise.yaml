@@ -106,7 +106,7 @@ jobs:
           name: build-and-terraform-full
       - name: debugging
         run: |
-          pwd && ls && ls -lah ./.terraform/plugins/linux_amd64/* && chmod -R a+x ./.terraform/plugins/linux_amd64/*
+          pwd && ls -lah && ls -lah .terraform/plugins/linux_amd64/* && chmod -R a+x ./.terraform/plugins/linux_amd64/*
       - name: test
         run: |
           terraform test
