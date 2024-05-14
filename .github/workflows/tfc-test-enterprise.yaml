@@ -111,6 +111,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TFE_TOKEN: ${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }}
         run: |
           terraform test
 
