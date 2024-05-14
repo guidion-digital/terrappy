@@ -104,9 +104,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-and-terraform-full
-      - name: debugging
+      - name: work-around for permission error
         run: |
-          pwd && ls -lah && ls -lah .terraform && chmod -R a+x .terraform
+          chmod -R a+x .terraform
       - name: test
         env:
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
