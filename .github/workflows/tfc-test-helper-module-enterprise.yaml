@@ -2,7 +2,7 @@ on:
   workflow_call:
 
 jobs:
-  unit-test-list:
+  test-list:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,13 +14,13 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
 
-  build:
+  tests:
     runs-on: ubuntu-latest
-    needs: [ unit-test-list ]
+    needs: [ test-list ]
 
     strategy:
       matrix: 
-        folders: ${{ fromJson(needs.unit-test-list.outputs.matrix) }}
+        folders: ${{ fromJson(needs.test-list.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v4
