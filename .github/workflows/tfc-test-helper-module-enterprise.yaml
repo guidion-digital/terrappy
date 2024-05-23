@@ -61,6 +61,7 @@ jobs:
       - name: Install tflocal
         run: pip install terraform-local
       - name: Test API
+        working-directory: ./examples
         run: |
           cd "${{ matrix.folders }}"
           tflocal init
