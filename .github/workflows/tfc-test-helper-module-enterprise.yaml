@@ -1,0 +1,101 @@
+# This is version of the workflow is nearly the same as 'tfc-deploy.yaml', save
+# for the fact that it relies on an enterprise feature which allows us to protect
+# the environment (containing the Terraform Cloud token).
+#
+# Can be run by either accessing a repository environment containing all the
+# required variables, or by passing the variables explicitly as inputs:
+#
+# For environment method:
+#
+#   - Pass the input 'environment_name', being the name of the environment with
+#     the variables
+#   - Pass the secrets by setting 'secrets: inherit' on the calling job
+#
+# For either method, the following must be available either via inputs or the
+# environment:
+#
+# - 'tfc_organization'
+# - 'tfc_api_token' (secret),
+# - 'tfc_planner_api_token' (secret)
+# - 'tfc_workspace'
+#
+# If 'environment_name' is supplied, it will win for any values found in both
+# inputs and that environment
+
+on:
+  workflow_call:
+    inputs:
+      environment_name:
+        description: The Github environment containing all the variables needed
+        required: false
+        type: string
+        default: ''
+      tfc_organization:
+        description: Name of the TFC organization you're deploying to
+        required: false
+        type: string
+      tfc_workspace:
+        description: Name of the TFC workspace we're using
+        required: false
+        type: string
+      tfc_approvers:
+        description: CSV of people allowed to approve this plan. Will pause the workflow for plan approval if provided
+        required: false
+        type: string
+        default: ''
+      artifact_name:
+        description: Name of the workflow artifact containing the build and Terraform files
+        required: false
+        type: string
+        default: build-and-terraform
+      retention-days:
+        description: How long to store artifacts
+        required: false
+        type: number
+        default: 2
+      approval_timeout:
+        description: How long the approval step will wait before timeing out
+        required: false
+        type: number
+        default: 360
+    secrets:
+      tfc_api_token:
+        description: Token used to talk to Terraform Cloud
+        required: false
+      tfc_planner_api_token:
+        description: Token used to talk to Terraform Cloud for plans
+        required: true
+
+jobs:
+  get-example-directories:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.value }}
+    steps:
+      - id: matrix
+        run: |
+          ls | jq -R -s -c 'split("\n")[:-1]' >> $GITHUB_OUTPUT
+          working-directory: ./examples
+      - run: |
+          echo "${{ steps.matrix.outputs.value }}"
+
+
+  tf-test-localstack:
+    needs: [ get-example-directories ]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        value: ${{fromJSON(needs.setup.outputs.matrix)}}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start LocalStack
+        uses: LocalStack/setup-localstack@main
+        with:
+          image-tag: 'latest'
+      - name: Install tflocal
+        run: pip install terraform-local
+      - name: Test API
+        run: |
+          cd "${{ matrix.value }}"
+          tflocal init
+          tflocal plan
