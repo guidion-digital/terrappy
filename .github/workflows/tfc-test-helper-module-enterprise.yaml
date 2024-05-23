@@ -39,8 +39,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Get LS Output
         id: matrix_step
+        working-directory: ./examples
         run: |
-          list=$(ls);
+          list=$(ls -1);
           matrix_values=$(echo '[ "'"$(echo "$list" | sed ':a;N;$!ba;s/\n/", "/g')"'" ]')
           echo "Matrix values: $matrix_values"
           echo "matrix_values=$matrix_values" >> $GITHUB_OUTPUT
