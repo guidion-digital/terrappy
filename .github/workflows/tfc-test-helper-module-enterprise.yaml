@@ -40,7 +40,7 @@ jobs:
       - name: Get LS Output
         id: matrix_step
         run: |
-          list=$(ls -1);
+          list=$(ls);
           matrix_values=$(echo '[ "'"$(echo "$list" | sed ':a;N;$!ba;s/\n/", "/g')"'" ]')
           echo "Matrix values: $matrix_values"
           echo "matrix_values=$matrix_values" >> $GITHUB_OUTPUT
