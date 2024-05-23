@@ -32,30 +32,25 @@ on:
         default: ''
 
 jobs:
-  convert-to-matrix:
+  unit-test-list:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-      - name: Get LS Output
-        id: matrix_step
+      - id: set-matrix
         working-directory: ./examples
-        run: |
-          list=$(ls -1);
-          matrix_values=$(echo '[ "'"$(echo "$list" | sed ':a;N;$!ba;s/\n/", "/g')"'" ]')
-          echo "Matrix values: $matrix_values"
-          echo "matrix_values=$matrix_values" >> $GITHUB_OUTPUT
+        run: echo "matrix=$(ls | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
     outputs:
-      matrix-combination: ${{ steps.matrix_step.output.matrix_values }} 
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
 
   build:
     runs-on: ubuntu-latest
-    needs: [ convert-to-matrix ]
+    needs: [ unit-test-list ]
 
     strategy:
-      matrix:
-        filename: ${{fromJSON(needs.convert-to-matrix.outputs.matrix-combinations)}}
+      matrix: 
+        folders: ${{ fromJson(needs.unit-test-list.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -67,6 +62,6 @@ jobs:
         run: pip install terraform-local
       - name: Test API
         run: |
-          cd "${{ matrix.filename }}"
+          cd "${{ matrix.folders }}"
           tflocal init
           tflocal plan
