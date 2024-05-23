@@ -30,41 +30,6 @@ on:
         required: false
         type: string
         default: ''
-      tfc_organization:
-        description: Name of the TFC organization you're deploying to
-        required: false
-        type: string
-      tfc_workspace:
-        description: Name of the TFC workspace we're using
-        required: false
-        type: string
-      tfc_approvers:
-        description: CSV of people allowed to approve this plan. Will pause the workflow for plan approval if provided
-        required: false
-        type: string
-        default: ''
-      artifact_name:
-        description: Name of the workflow artifact containing the build and Terraform files
-        required: false
-        type: string
-        default: build-and-terraform
-      retention-days:
-        description: How long to store artifacts
-        required: false
-        type: number
-        default: 2
-      approval_timeout:
-        description: How long the approval step will wait before timeing out
-        required: false
-        type: number
-        default: 360
-    secrets:
-      tfc_api_token:
-        description: Token used to talk to Terraform Cloud
-        required: false
-      tfc_planner_api_token:
-        description: Token used to talk to Terraform Cloud for plans
-        required: true
 
 jobs:
   get-example-directories:
