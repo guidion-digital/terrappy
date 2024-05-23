@@ -93,7 +93,7 @@ jobs:
 
 
   tf-plan:
-    needs: tf-test
+    needs: tf-init
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
