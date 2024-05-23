@@ -1,35 +1,5 @@
-# This is version of the workflow is nearly the same as 'tfc-deploy.yaml', save
-# for the fact that it relies on an enterprise feature which allows us to protect
-# the environment (containing the Terraform Cloud token).
-#
-# Can be run by either accessing a repository environment containing all the
-# required variables, or by passing the variables explicitly as inputs:
-#
-# For environment method:
-#
-#   - Pass the input 'environment_name', being the name of the environment with
-#     the variables
-#   - Pass the secrets by setting 'secrets: inherit' on the calling job
-#
-# For either method, the following must be available either via inputs or the
-# environment:
-#
-# - 'tfc_organization'
-# - 'tfc_api_token' (secret),
-# - 'tfc_planner_api_token' (secret)
-# - 'tfc_workspace'
-#
-# If 'environment_name' is supplied, it will win for any values found in both
-# inputs and that environment
-
 on:
   workflow_call:
-    inputs:
-      environment_name:
-        description: The Github environment containing all the variables needed
-        required: false
-        type: string
-        default: ''
 
 jobs:
   unit-test-list:
