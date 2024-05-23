@@ -71,7 +71,7 @@ jobs:
   cancel:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
       - name: cancel
         run: tfcd -t ${{ secrets.tfc_api_token }} -w ${{ inputs.tfc_workspace || vars.tfc_workspace }} run cancel --auto-approve current
@@ -80,7 +80,7 @@ jobs:
     needs: cancel
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -114,7 +114,7 @@ jobs:
     needs: tf-init
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     permissions:
       issues: write
     steps:
@@ -147,7 +147,7 @@ jobs:
     needs: tf-plan
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     if: always()
     steps:
         # The first step is a bit of a hack. It allows us to have the

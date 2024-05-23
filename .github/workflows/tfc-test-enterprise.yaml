@@ -69,7 +69,7 @@ on:
 jobs:
   tf-init:
     runs-on: ubuntu-latest
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -98,7 +98,7 @@ jobs:
   tf-test:
     needs: tf-init
     runs-on: ubuntu-latest
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -119,7 +119,7 @@ jobs:
   tf-plan:
     needs: tf-test
     runs-on: ubuntu-latest
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.0.19
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
