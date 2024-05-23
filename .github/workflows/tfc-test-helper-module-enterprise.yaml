@@ -45,13 +45,6 @@ jobs:
           matrix_values=$(echo '[ "'"$(echo "$list" | sed ':a;N;$!ba;s/\n/", "/g')"'" ]')
           echo "Matrix values: $matrix_values"
           echo "matrix_values=$matrix_values" >> $GITHUB_OUTPUT
-      # - id: matrix
-      #   working-directory: ./examples
-      #   run: |
-      #    VALUE=`ls | jq -R -s -c 'split("\n")[:-1]'`
-      #    echo $VALUE >> $GITHUB_OUTPUT
-      # - run: |
-      #     echo "${{ steps.matrix.outputs.matrix_values }}"
     outputs:
       matrix-combination: ${{ steps.matrix_step.output.matrix_values }} 
 
@@ -61,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        value:  ${{ fromJSON(needs.setup-matrix.outputs.matrix-combinations) }}
+        value:  ${{ fromJSON(needs.get-example-directories.outputs.matrix-combinations) }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
