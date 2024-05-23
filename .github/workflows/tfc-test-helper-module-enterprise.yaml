@@ -34,17 +34,25 @@ on:
 jobs:
   get-example-directories:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.matrix.outputs.value }}
+
     steps:
       - uses: actions/checkout@v4
-      - id: matrix
-        working-directory: ./examples
+      - name: Get LS Output
+        id: matrix_step
         run: |
-         VALUE=`ls | jq -R -s -c 'split("\n")[:-1]'`
-         echo $VALUE >> $GITHUB_OUTPUT
-      - run: |
-          echo "${{ steps.matrix.outputs.value }}"
+          list=$(ls -1);
+          matrix_values=$(echo '[ "'"$(echo "$list" | sed ':a;N;$!ba;s/\n/", "/g')"'" ]')
+          echo "Matrix values: $matrix_values"
+          echo "matrix_values=$matrix_values" >> $GITHUB_OUTPUT
+      # - id: matrix
+      #   working-directory: ./examples
+      #   run: |
+      #    VALUE=`ls | jq -R -s -c 'split("\n")[:-1]'`
+      #    echo $VALUE >> $GITHUB_OUTPUT
+      # - run: |
+      #     echo "${{ steps.matrix.outputs.matrix_values }}"
+    outputs:
+      matrix-combination: ${{ steps.matrix_step.output.matrix_values }} 
 
 
   tf-test-localstack:
@@ -52,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        value: ${{fromJSON(needs.setup.outputs.matrix)}}
+        value:  ${{ fromJSON(needs.setup-matrix.outputs.matrix-combinations) }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
