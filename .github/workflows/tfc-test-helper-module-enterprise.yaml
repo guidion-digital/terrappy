@@ -41,7 +41,8 @@ jobs:
       - id: matrix
         working-directory: ./examples
         run: |
-         echo `value=${ls | jq -R -s -c 'split("\n")[:-1]'}` >> $GITHUB_OUTPUT
+         VALUE=${ls | jq -R -s -c 'split("\n")[:-1]'} 
+         echo $VALUE >> $GITHUB_OUTPUT
       - run: |
           echo "${{ steps.matrix.outputs.value }}"
 
