@@ -1,6 +1,11 @@
 on:
   workflow_call:
     inputs:
+      environment_name:
+        description: The Github environment containing all the variables needed
+        required: false
+        type: string
+        default: ''
       tfc_organization:
         description: Name of the TFC organization you're deploying to
         required: false
@@ -9,6 +14,11 @@ on:
         description: Name of the TFC workspace we're using
         required: false
         type: string
+      tfc_approvers:
+        description: CSV of people allowed to approve this plan. Will pause the workflow for plan approval if provided
+        required: false
+        type: string
+        default: ''
       artifact_name:
         description: Name of the workflow artifact containing the build and Terraform files
         required: false
@@ -19,6 +29,11 @@ on:
         required: false
         type: number
         default: 2
+      approval_timeout:
+        description: How long the approval step will wait before timeing out
+        required: false
+        type: number
+        default: 360
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
@@ -65,7 +80,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-and-terraform-full
-      - name: Work-around for permission error
+      - name: work-around for permission error
         run: |
           chmod -R a+x .terraform
       - name: test
@@ -75,6 +90,7 @@ jobs:
           TFE_TOKEN: ${{ secrets.tfc_api_token_networking || secrets.tfc_api_token || secrets.tfc_planner_api_token }}
         run: |
           terraform test
+
 
   tf-plan:
     needs: tf-init
