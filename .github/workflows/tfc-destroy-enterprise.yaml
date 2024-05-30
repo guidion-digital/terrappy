@@ -48,7 +48,7 @@ jobs:
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
       - name: Create folder for init files
-        run: mkdir -p examples/test_app
+        run: mkdir -p ${{ inputs.working_directory || vars.working_directory }}
       - name: Add backend.tf
         working-directory: ${{ inputs.working_directory || vars.working_directory }}
         run: |
