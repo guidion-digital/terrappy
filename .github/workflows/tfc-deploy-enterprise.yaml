@@ -100,8 +100,25 @@ jobs:
             **/*.terraform.lock.hcl
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
 
-  tf-plan:
+  check-deployment-policies:
     needs: tf-init
+    permissions:
+      actions: read
+    runs-on: ubuntu-latest
+    outputs:
+      reviewers: ${{ steps.reviewers.outputs.reviewers }}
+    steps:
+      - id: reviewers
+        run: |
+          reviewers=$(curl -s -L -H "Accept: application/vnd.github+json" \
+               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+               -H "X-GitHub-Api-Version: 2022-11-28" \
+               "https://api.github.com/repos/$GITHUB_REPOSITORY/environments/${{ inputs.environment_name }}" | jq -r '.protection_rules[] | select(.reviewers != null) | .id')
+          echo "reviewers=$reviewers" >> "$GITHUB_OUTPUT"
+
+  tf-plan:
+    if: ${{ needs.check-deployment-policies.outputs.reviewers != null }}
+    needs: check-deployment-policies
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
@@ -114,12 +131,26 @@ jobs:
           TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
 
+  # TODO:
+  # notify-devs:
+  #   needs: tf-plan
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Sent Slack message
+  #       TODO: https://github.com/slackapi/slack-github-action
+
   tf-apply:
     needs: tf-plan
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
+        # The first step is a bit of a hack. It allows us to have the
+        # conditional plan above, whilst still using 'needs' on this job even if
+        # that conditional job doesn't run
+      - name: Fail if tf-plan failed
+        if: ${{ needs.tf-plan.result == 'failure' }}
+        run: exit 1
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
