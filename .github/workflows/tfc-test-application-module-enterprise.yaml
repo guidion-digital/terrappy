@@ -1,27 +1,3 @@
-# This is version of the workflow is nearly the same as 'tfc-deploy.yaml', save
-# for the fact that it relies on an enterprise feature which allows us to protect
-# the environment (containing the Terraform Cloud token).
-#
-# Can be run by either accessing a repository environment containing all the
-# required variables, or by passing the variables explicitly as inputs:
-#
-# For environment method:
-#
-#   - Pass the input 'environment_name', being the name of the environment with
-#     the variables
-#   - Pass the secrets by setting 'secrets: inherit' on the calling job
-#
-# For either method, the following must be available either via inputs or the
-# environment:
-#
-# - 'tfc_organization'
-# - 'tfc_api_token' (secret),
-# - 'tfc_planner_api_token' (secret)
-# - 'tfc_workspace'
-#
-# If 'environment_name' is supplied, it will win for any values found in both
-# inputs and that environment
-
 on:
   workflow_call:
     inputs:
@@ -52,7 +28,7 @@ on:
         description: Name of the directory holding the source to be deployed
         required: false
         type: string
-        default: dist
+        default: examples/**/dist
       retention-days:
         description: How long to store artifacts
         required: false
@@ -94,31 +70,36 @@ jobs:
         with:
           name: build-and-terraform-full
           path: |
-            ${{ inputs.source_dir || vars.source_dir }}
             **/*.tf
+            **/*.hcl
             **/*.terraform
             **/*.terraform.lock.hcl
+            ${{ inputs.source_dir || vars.source_dir }}
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
 
-  check-deployment-policies:
+  tf-test:
     needs: tf-init
-    permissions:
-      actions: read
     runs-on: ubuntu-latest
-    outputs:
-      reviewers: ${{ steps.reviewers.outputs.reviewers }}
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
-      - id: reviewers
+      - name: Get the build artifacts and Terraform files
+        uses: actions/download-artifact@v4
+        with:
+          name: build-and-terraform-full
+      - name: work-around for permission error
         run: |
-          reviewers=$(curl -s -L -H "Accept: application/vnd.github+json" \
-               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-               -H "X-GitHub-Api-Version: 2022-11-28" \
-               "https://api.github.com/repos/$GITHUB_REPOSITORY/environments/${{ inputs.environment_name }}" | jq -r '.protection_rules[] | select(.reviewers != null) | .id')
-          echo "reviewers=$reviewers" >> "$GITHUB_OUTPUT"
+          chmod -R a+x .terraform
+      - name: test
+        env:
+          AWS_ACCESS_KEY_ID: ${{ vars.TF_TEST_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_TEST_AWS_SECRET_ACCESS_KEY }}
+          TFE_TOKEN: ${{ secrets.tfc_api_token_networking || secrets.tfc_api_token || secrets.tfc_planner_api_token }}
+        run: |
+          terraform test
+
 
   tf-plan:
-    if: ${{ needs.check-deployment-policies.outputs.reviewers != null }}
-    needs: check-deployment-policies
+    needs: tf-init
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
@@ -130,30 +111,3 @@ jobs:
         run: |
           TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
-
-  # TODO:
-  # notify-devs:
-  #   needs: tf-plan
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Sent Slack message
-  #       TODO: https://github.com/slackapi/slack-github-action
-
-  tf-apply:
-    needs: tf-plan
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.environment_name }}
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
-    steps:
-        # The first step is a bit of a hack. It allows us to have the
-        # conditional plan above, whilst still using 'needs' on this job even if
-        # that conditional job doesn't run
-      - name: Fail if tf-plan failed
-        if: ${{ needs.tf-plan.result == 'failure' }}
-        run: exit 1
-      - name: Get the build artifacts and Terraform files
-        uses: actions/download-artifact@v4
-        with:
-          name: build-and-terraform-full
-      - name: Run terraform apply with auto-approval
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform apply -auto-approve
