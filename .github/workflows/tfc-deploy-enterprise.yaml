@@ -144,13 +144,17 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
-    if: always()
+    if: ${{ !cancelled() }}
     steps:
-        # The first step is a bit of a hack. It allows us to have the
-        # conditional plan above, whilst still using 'needs' on this job even if
-        # that conditional job doesn't run
+        # This first step allows us to specify the plan job above in "needs",
+        # even if it doesn't run. Done by:
+        #   - Setting "if" to "!cancelled()", so that this job always runs (essentially
+        #     overriding the "needs"), unless the workflow is cancelled
+        #   - Failing this job if the result of the plan job is "failure" or "cancelled"
+        # This means that this job will always run (even if the plan job doesn't)
+        # but is still affected by a bad result from the plan job when that job does run
       - name: Fail if tf-plan failed
-        if: ${{ needs.tf-plan.result == 'failure' }}
+        if: ${{ contains(fromJSON('["failure"], ["cancelled"]'), needs.tf-plan.result) }}
         run: exit 1
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4

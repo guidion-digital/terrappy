@@ -1,3 +1,8 @@
+[![forthebadge](https://forthebadge.com/images/badges/built-with-resentment.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/compatibility-betamax.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/powered-by-overtime.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)](https://forthebadge.com)
+
 N.B. Terrappy consists of many interdependent modules, and Guidion is still in the process of open sourcing them. This notice will be removed once the minimum dependency requirements are met, until then the ones that _are_ already available will not be of much use by themselves.
 
 ---

@@ -75,7 +75,6 @@ jobs:
     steps:
       - name: cancel
         run: tfcd -t ${{ secrets.tfc_api_token }} -w ${{ inputs.tfc_workspace || vars.tfc_workspace }} run cancel --auto-approve current
-
   tf-init:
     needs: cancel
     runs-on: ubuntu-latest
@@ -105,7 +104,6 @@ jobs:
             **/*.terraform
             **/*.terraform.lock.hcl
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
-
   tf-plan:
     # We can't use if at this level because of this bug in Github Actions:
     # https://github.com/orgs/community/discussions/113313
@@ -142,7 +140,6 @@ jobs:
         with:
           secret: ${{ steps.generate_approver_token.outputs.token || github.TOKEN }}
           approvers: ${{ inputs.tfc_approvers || vars.tfc_approvers }}
-
   tf-apply:
     needs: tf-plan
     runs-on: ubuntu-latest
