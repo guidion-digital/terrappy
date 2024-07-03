@@ -21,6 +21,10 @@
 #
 # If 'environment_name' is supplied, it will win for any values found in both
 # inputs and that environment
+#
+# Theoretically, the 'slack_channel' input and the 'slack_token' secret are both
+# optional since the 'Notify devs' step should fail gracefully. Their optionality
+# has not been tested, however ;)
 
 on:
   workflow_call:
@@ -63,6 +67,11 @@ on:
         required: false
         type: number
         default: 360
+      slack_channel:
+        description: Channel to send approval request messages to
+        required: false
+        type: string
+        default: production-deploys
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
@@ -130,14 +139,28 @@ jobs:
         run: |
           TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
-
-  # TODO:
-  # notify-devs:
-  #   needs: tf-plan
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Sent Slack message
-  #       TODO: https://github.com/slackapi/slack-github-action
+      - name: Notify devs
+        run: |
+          curl -H "Content-type: application/json" \
+            --data '{"channel":"${{ inputs.slack_channel }}","blocks":[{
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "A deploy for ${{ inputs.tfc_workspace }} is waiting in ${{ inputs.environment_name }}"},
+                        "accessory": {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Check out the plan",
+                                "emoji": true
+                            },
+                            "url": "${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}",
+                            "action_id": "view-plan"
+                        }
+                      }]
+                    }' \
+            -H "Authorization: Bearer ${{ secrets.slack_token }}" \
+            -X POST https://slack.com/api/chat.postMessage
 
   tf-apply:
     needs: tf-plan
