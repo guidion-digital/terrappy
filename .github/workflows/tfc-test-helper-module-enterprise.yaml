@@ -16,7 +16,7 @@ jobs:
     needs: [ list-directories ]
     strategy:
       matrix:
-        folders: ${{ fromJson(needs.test-list.outputs.matrix) }}
+        folders: ${{ fromJson(needs.list-directories.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - name: Start LocalStack
