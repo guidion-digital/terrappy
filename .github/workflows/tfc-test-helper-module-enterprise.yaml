@@ -31,8 +31,8 @@ jobs:
           cd "${{ matrix.folders }}"
           tflocal init
           tflocal plan
-  test-completed:
+  tests-completed:
     runs-on: ubuntu-latest
     steps:
-      - name: Final step # Needed because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
-        run: echo Completed
+      - name: Tests completed # Needed because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
+        run: echo "All tests completed"
