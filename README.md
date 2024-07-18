@@ -54,3 +54,9 @@ Finally, we have the application modules which are the ultimate point for all th
 There is a reusable [Github Actions workflow](./cicd.md) which you can plug into your existing workflows.
 
 If you are using Circle CI, there is also an [Orb](https://github.com/GuidionOps/terraform-cloud-deployer?tab=readme-ov-file#circle-ci-orb) you can use.
+
+---
+
+## Contributing
+
+Please see [this page](./contributing.md).
