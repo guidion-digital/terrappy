@@ -37,7 +37,7 @@ jobs:
         run: |
           cd "${{ matrix.folders }}"
           tflocal init
-          tflocal apply
+          tflocal apply --auto-approve
   completed:
     needs: localstack-apply
     runs-on: ubuntu-latest
