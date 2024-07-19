@@ -1,0 +1,39 @@
+on:
+  workflow_call:
+
+jobs:
+  get-matrix-directories:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: set-matrix
+        working-directory: ./examples
+        run: echo "matrix=$(ls | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+  localstack-plan:
+    runs-on: ubuntu-latest
+    needs: [ get-matrix-directories ]
+    strategy:
+      matrix:
+        folders: ${{ fromJson(needs.get-matrix-directories.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start LocalStack
+        uses: LocalStack/setup-localstack@main
+        with:
+          image-tag: 'latest'
+      - name: Install tflocal
+        run: pip install terraform-local
+      - name: Test API
+        working-directory: ./examples
+        run: |
+          cd "${{ matrix.folders }}"
+          tflocal init
+          tflocal apply
+  completed:
+    runs-on: ubuntu-latest
+    needs: [ localstack-plan ]
+    steps:
+      - name: Tests completed # Needed because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
+        run: echo "All tests completed"
