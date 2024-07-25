@@ -52,12 +52,24 @@ jobs:
           tflocal init
           tflocal plan
 
-  completed:
-    needs: localstack-plan
-    if: ${{ success() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Completed # Needed because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
-        run: echo "Completed"
+  # completed:
+  #   needs: localstack-plan
+  #   if: ${{ success() }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Completed # Needed because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
+  #       run: echo "Completed"
 
-        
+  results:
+      if: ${{ always() }}
+      runs-on: ubuntu-latest
+      name: Final Results
+      needs: [localstack-plan]
+      steps:
+        - run: |
+            result="${{ needs.localstack-plan.result }}"
+            if [[ $result == "success" || $result == "skipped" ]]; then
+              exit 0
+            else
+              exit 1
+            fi
