@@ -14,6 +14,8 @@ jobs:
   localstack-plan:
     needs: get-matrix-directories
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     strategy:
       matrix:
         folders: ${{ fromJson(needs.get-matrix-directories.outputs.matrix) }}
