@@ -64,7 +64,7 @@ jobs:
             if [[ ${{ needs.changes.outputs.terraform }} == "false" ]]
             then
               exit 0
-            elif  [[ ${{ needs.localstack-apply.result }} == "success" ]]
+            elif  [[ ${{ needs.localstack-plan.result }} == "success" ]]
             then
               exit 0
             else
