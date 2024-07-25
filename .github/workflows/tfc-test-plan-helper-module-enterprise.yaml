@@ -56,8 +56,7 @@ jobs:
           tflocal plan
 
   completed:
-    needs: localstack-plan
-    # if: ${{ needs.changes.outputs.terraform == 'true' }}
+    needs: [changes, localstack-plan]
     if: |
       ${{ needs.changes.outputs.terraform == 'true' }} ||
       ${{ needs.changes.outputs.terraform == 'false' }}
