@@ -68,18 +68,13 @@ jobs:
         - run: |
             changes_results="${{ needs.changes.outputs.terraform }}"
             plan_results="${{ needs.localstack-plan.result }}"
-            if [[ $changes_results == "true" ]]; then
+
+            if [[ $changes_results == "false" ]]
+            then
               exit 0
-            elif  [[ $plan_results == "success" ]]; then
+            elif  [[ $plan_results == "success" ]]
+            then
               exit 0
             else
               exit 1
             fi
-
-          # - run: |
-          # result="${{ needs.localstack-plan.result }}"
-          # if [[ $result == "success" || $result == "skipped" ]]; then
-          #   exit 0
-          # else
-          #   exit 1
-          # fi
