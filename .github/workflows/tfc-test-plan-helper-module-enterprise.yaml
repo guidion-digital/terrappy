@@ -7,7 +7,7 @@ jobs:
     permissions:
       pull-requests: read
     outputs:
-      backend: ${{ steps.changes.outputs.terraform }}
+      terraform: ${{ steps.changes.outputs.terraform }}
     steps:
     - uses: dorny/paths-filter@v3
       id: changes
