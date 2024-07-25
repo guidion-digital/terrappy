@@ -4,9 +4,8 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
-
-    # permissions:
-    #   pull-requests: read
+    permissions:
+      pull-requests: read
     outputs:
       terraform: ${{ steps.changes.outputs.terraform }}
     steps:
