@@ -19,8 +19,8 @@ jobs:
   get-matrix-directories:
     needs: changes
     if: ${{ needs.changes.outputs.terraform == 'true' }}
-    # permissions:
-    #   contents: read
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
