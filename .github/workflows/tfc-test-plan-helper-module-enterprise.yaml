@@ -4,11 +4,13 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
+
+    # permissions:
+    #   pull-requests: read
     outputs:
       terraform: ${{ steps.changes.outputs.terraform }}
     steps:
+    - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
       id: changes
       with:
