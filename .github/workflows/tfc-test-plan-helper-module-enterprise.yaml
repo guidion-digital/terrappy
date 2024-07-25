@@ -63,15 +63,19 @@ jobs:
   completed:
       if: ${{ always() }}
       runs-on: ubuntu-latest
-      needs: [localstack-plan]
+      needs: [changes, localstack-plan]
       steps:
         - run: |
-            result="${{ needs.localstack-plan.result }}"
-            if [[ $result == "success" ]]; then
+            changes_results="${{ needs.changes.outputs.terraform }}"
+            plan_results="${{ needs.localstack-plan.result }}"
+            if [[ $changes_results == "true" ]]; then
+              exit 0
+            elif  [[ $plan_results == "success" ]]; then
               exit 0
             else
               exit 1
             fi
+
           # - run: |
           # result="${{ needs.localstack-plan.result }}"
           # if [[ $result == "success" || $result == "skipped" ]]; then
