@@ -53,7 +53,7 @@ jobs:
 
   completed:
     needs: localstack-plan
-    if: ${{ failure() }}
+    if: ${{ success() }}
     runs-on: ubuntu-latest
     steps:
       - name: Completed # Needed because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
