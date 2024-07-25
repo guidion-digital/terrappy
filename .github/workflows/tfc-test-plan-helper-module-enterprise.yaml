@@ -57,6 +57,10 @@ jobs:
 
   completed:
     needs: localstack-plan
+    # if: ${{ needs.changes.outputs.terraform == 'true' }}
+    if: |
+      ${{ needs.changes.outputs.terraform == 'true' }} ||
+      ${{ needs.changes.outputs.terraform == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - name: Completed # Needed because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
