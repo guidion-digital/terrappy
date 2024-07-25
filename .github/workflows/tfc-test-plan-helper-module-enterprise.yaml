@@ -67,8 +67,15 @@ jobs:
       steps:
         - run: |
             result="${{ needs.localstack-plan.result }}"
-            if [[ $result == "success" || $result == "skipped" ]]; then
+            if [[ $result == "success" ]]; then
               exit 0
             else
               exit 1
             fi
+          # - run: |
+          # result="${{ needs.localstack-plan.result }}"
+          # if [[ $result == "success" || $result == "skipped" ]]; then
+          #   exit 0
+          # else
+          #   exit 1
+          # fi
