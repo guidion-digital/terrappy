@@ -32,6 +32,7 @@ jobs:
 
   localstack-plan:
     needs: get-matrix-directories
+    if: ${{ success() }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
