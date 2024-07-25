@@ -2,7 +2,26 @@ on:
   workflow_call:
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    # Required permissions
+    permissions:
+      pull-requests: read
+    # Set job outputs to values from filter step
+    outputs:
+      backend: ${{ steps.changes.outputs.terraform }}
+    steps:
+    # For pull requests it's not necessary to checkout the code
+    - uses: dorny/paths-filter@v3
+      id: changes
+      with:
+        filters: |
+          terraform:
+            - '**/*.tf'
+
   get-matrix-directories:
+    needs: changes
+    if: ${{ needs.changes.outputs.terraform == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -11,8 +30,10 @@ jobs:
         run: echo "matrix=$(ls | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+
   localstack-plan:
     needs: get-matrix-directories
+    if: ${{ needs.changes.outputs.terraform == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
@@ -21,27 +42,19 @@ jobs:
         folders: ${{ fromJson(needs.get-matrix-directories.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            terraform:
-              - '**/*.tf'
       - name: Start LocalStack
-        if: steps.changes.outputs.terraform == 'true'
         uses: LocalStack/setup-localstack@main
         with:
           image-tag: 'latest'
       - name: Install tflocal
-        if: steps.changes.outputs.terraform == 'true'
         run: pip install terraform-local
       - name: Test API
-        if: steps.changes.outputs.terraform == 'true'
         working-directory: ./examples
         run: |
           cd "${{ matrix.folders }}"
           tflocal init
           tflocal plan
+
   completed:
     needs: localstack-plan
     runs-on: ubuntu-latest
