@@ -19,6 +19,8 @@ jobs:
   get-matrix-directories:
     needs: changes
     if: ${{ needs.changes.outputs.terraform == 'true' }}
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,8 +33,6 @@ jobs:
   localstack-plan:
     needs: get-matrix-directories
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
     strategy:
       matrix:
         folders: ${{ fromJson(needs.get-matrix-directories.outputs.matrix) }}
