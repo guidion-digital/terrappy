@@ -6,6 +6,10 @@ on:
         required: true
         type: string
         default: 'localstack'
+    outputs:
+      changes:
+        description: "Output from changes GH Actions"
+        value: ${{ jobs.changes.outputs.terraform }}
 
 jobs:
   changes:
