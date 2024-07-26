@@ -10,6 +10,9 @@ on:
       changes:
         description: "Output from changes GH Actions"
         value: ${{ jobs.changes.outputs.terraform }}
+      local-stack-apply-success:
+        description: "Output wether job is is succesful or not"
+        value: ${{ jobs.localstack-apply.result }}
 
 jobs:
   changes:
