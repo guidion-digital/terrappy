@@ -67,7 +67,7 @@ jobs:
   # This is needed because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
   # Because skipped tests are marked as succesfull in GitHub required test, we test here if it was succesfully run and then mark it as such, if it's skipped or fails then it's marked as failed.
   completed:
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     needs: [changes, localstack-apply]
     outputs:
