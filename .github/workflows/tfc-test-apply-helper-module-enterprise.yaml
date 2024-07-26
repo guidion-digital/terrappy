@@ -12,7 +12,7 @@ on:
         value: ${{ jobs.changes.outputs.terraform }}
       local-stack-apply-success:
         description: "Output wether job is is succesful or not"
-        value: ${{ jobs.localstack-apply.outputs.localstack-apply-result }}
+        value: ${{ jobs.completed.outputs.localstack-apply-result }}
 
 jobs:
   changes:
@@ -45,8 +45,6 @@ jobs:
   localstack-apply:
     needs: get-matrix-directories
     runs-on: ubuntu-latest
-    outputs:
-      localstack-apply-result: ${{ steps.localstack-apply.conclusion }}
     environment: ${{ inputs.environment_name }}
     strategy:
       matrix:
@@ -72,6 +70,8 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [changes, localstack-apply]
+    outputs:
+      localstack-apply-result: ${{ needs.localstack-apply.result }}
     steps:
       - run: |
           if [[ ${{ needs.changes.outputs.terraform }} == "false" ]]
