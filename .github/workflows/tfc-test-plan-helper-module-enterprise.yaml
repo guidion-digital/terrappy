@@ -61,7 +61,8 @@ jobs:
       needs: [changes, localstack-plan]
       steps:
         - run: |
-            if [[ ${{ needs.changes.outputs.terraform }} == "false" ]] || [[ ${{ needs.localstack-plan.result }} == "success" ]] then;
+            if [[ ${{ needs.changes.outputs.terraform }} == "false" ]] || [[ ${{ needs.localstack-plan.result }} == "success" ]] 
+            then
               exit 0
             else
               exit 1
