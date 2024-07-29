@@ -73,13 +73,16 @@ jobs:
     outputs:
       localstack-apply-result: ${{ needs.localstack-apply.result }}
     steps:
-      - run: |
-          if [[ ${{ needs.changes.outputs.terraform }} == "false" ]]
-          then
-            exit 0
-          elif  [[ ${{ needs.localstack-apply.result }} == "success" ]]
-          then
-            exit 0
-          else
-            exit 1
-          fi
+      # - run: |
+      #     if [[ ${{ needs.changes.outputs.terraform }} == "false" ]] || [[ ${{ needs.localstack-apply.result }} == "success" ]] 
+      #     then
+      #       exit 0
+      #     else
+      #       exit 1
+      #     fi
+      # - name: My first step
+      - if: ${{ (needs.changes.outputs.terraform == 'false')  || (needs.localstack-apply.result  == 'success') }}
+        run: exit 0
+      # - name: My backup step
+      - if: ${{ failure() }}
+        run: exit 1
