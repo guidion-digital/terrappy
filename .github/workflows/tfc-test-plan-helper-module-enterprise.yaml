@@ -71,5 +71,5 @@ jobs:
         - if: ${{ (needs.changes.outputs.terraform == 'false')  || (needs.localstack-plan.result  == 'success') }}
           run: exit 0
         # - name: My backup step
-        - if: ${{ failure() }}
+        - if: ${{ !cancelled() }}
           run: exit 1
