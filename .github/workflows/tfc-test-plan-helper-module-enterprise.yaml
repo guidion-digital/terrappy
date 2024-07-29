@@ -53,19 +53,15 @@ jobs:
           tflocal init
           tflocal plan
 
-  # This is needed because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
-  # Because skipped tests are marked as succesfull in GitHub required test, we test here if it was succesfully run and then mark it as such, if it's skipped or fails then it's marked as failed.
+  # Required because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
+  # Skipped tests are marked as succesfull in GitHub required test, we test here if it was succesfully run and then mark it as such, if it's skipped or fails then it's marked as failed.
   completed:
       if: ${{ !cancelled() }}
       runs-on: ubuntu-latest
       needs: [changes, localstack-plan]
       steps:
         - run: |
-            if [[ ${{ needs.changes.outputs.terraform }} == "false" ]]
-            then
-              exit 0
-            elif  [[ ${{ needs.localstack-plan.result }} == "success" ]]
-            then
+            if [[ ${{ needs.changes.outputs.terraform }} == "false" ]] || [[ ${{ needs.localstack-plan.result }} == "success" ]] then;
               exit 0
             else
               exit 1
