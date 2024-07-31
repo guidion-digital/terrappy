@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
-      contents: read
+      # contents: read
     outputs:
       terraform: ${{ steps.changes.outputs.terraform }}
     steps:
