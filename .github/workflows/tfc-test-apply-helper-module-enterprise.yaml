@@ -7,7 +7,7 @@ on:
         type: string
         default: 'localstack'
     outputs:
-      terraform-file-changes:
+      terraform-file-changes-result:
         description: "Output from terraform-file-changes GH Actions"
         value: ${{ jobs.terraform-file-changes.outputs.result }}
       local-stack-apply-result:
