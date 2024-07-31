@@ -80,9 +80,8 @@ jobs:
       #     else
       #       exit 1
       #     fi
-      # - name: My first step
-      - if: ${{ (needs.changes.outputs.terraform == 'false')  || (needs.localstack-apply.result  == 'success') }}
+      - id: succes
+        if: ${{ (needs.changes.outputs.terraform == 'false')  || (needs.localstack-apply.result  == 'success') }}
         run: exit 0
-      # - name: My backup step
-      - if: ${{ !cancelled() }}
+      - if: failure() && steps.succes.outcome != 'success'
         run: exit 1
