@@ -2,25 +2,25 @@ on:
   workflow_call:
 
 jobs:
-  changes:
+  terraform-file-changes:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
       # contents: read
     outputs:
-      terraform: ${{ steps.changes.outputs.terraform }}
+      result: ${{ steps.terraform-file-changes.outputs.terraform }}
     steps:
     - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
-      id: changes
+      id: terraform-file-changes
       with:
         filters: |
           terraform:
             - '**/*.tf'
 
   get-matrix-directories:
-    needs: changes
-    if: ${{ needs.changes.outputs.terraform == 'true' }}
+    needs: terraform-file-changes
+    if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
     # permissions:
       # contents: read
     runs-on: ubuntu-latest
@@ -58,10 +58,10 @@ jobs:
   completed:
       if: ${{ !cancelled() }}
       runs-on: ubuntu-latest
-      needs: [changes, localstack-plan]
+      needs: [terraform-file-changes, localstack-plan]
       steps:
         - id: workflow-or-terraform-change
-          if: ${{ (needs.changes.outputs.terraform == 'false')  || (needs.localstack-plan.result  == 'success') }}
+          if: ${{ (needs.terraform-file-changes.outputs.result == 'false')  || (needs.localstack-plan.result  == 'success') }}
           run: exit 0
         - if: failure() || steps.workflow-or-terraform-change.outcome != 'success'
           run: exit 1
