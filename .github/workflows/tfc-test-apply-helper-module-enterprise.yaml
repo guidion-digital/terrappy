@@ -73,15 +73,8 @@ jobs:
     outputs:
       localstack-apply-result: ${{ needs.localstack-apply.result }}
     steps:
-      # - run: |
-      #     if [[ ${{ needs.changes.outputs.terraform }} == "false" ]] || [[ ${{ needs.localstack-apply.result }} == "success" ]] 
-      #     then
-      #       exit 0
-      #     else
-      #       exit 1
-      #     fi
-      - id: succes
+      - id: workflow-or-terraform-change
         if: ${{ (needs.changes.outputs.terraform == 'false')  || (needs.localstack-apply.result  == 'success') }}
         run: exit 0
-      - if: failure() || steps.succes.outcome != 'success'
+      - if: failure() || steps.workflow-or-terraform-change.outcome != 'success'
         run: exit 1
