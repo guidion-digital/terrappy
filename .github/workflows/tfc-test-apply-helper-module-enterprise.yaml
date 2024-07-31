@@ -83,5 +83,5 @@ jobs:
       - id: succes
         if: ${{ (needs.changes.outputs.terraform == 'false')  || (needs.localstack-apply.result  == 'success') }}
         run: exit 0
-      - if: failure() && steps.succes.outcome != 'success'
+      - if: failure() || steps.succes.outcome != 'success'
         run: exit 1
