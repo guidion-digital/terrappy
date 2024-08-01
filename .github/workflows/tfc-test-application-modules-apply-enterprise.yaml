@@ -36,9 +36,24 @@ jobs:
           terraform:
             - '**/*.tf'
 
-  deploy:
+  build:
     needs: terraform-file-changes
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
+    concurrency:
+      group: ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-and-terraform
+          path: |
+            **/*.tf
+          retention-days: 2
+
+  deploy:
+    needs: build
     secrets: inherit
     permissions:
       issues: write

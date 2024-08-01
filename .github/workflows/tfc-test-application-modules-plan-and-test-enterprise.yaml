@@ -48,7 +48,22 @@ on:
         required: true
 
 jobs:
+  build:
+    concurrency:
+      group: ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-and-terraform
+          path: |
+            **/*.tf
+          retention-days: 2
+
   tf-init:
+    needs: build
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
