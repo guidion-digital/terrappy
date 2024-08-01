@@ -34,6 +34,11 @@ on:
         required: false
         type: number
         default: 360
+      destroy_targets:
+        description: "Terraform resources to target for destroy"
+        required: false
+        type: string
+        default: '["yellow", "green", "black"]'
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
@@ -70,8 +75,19 @@ jobs:
             **/*.terraform.lock.hcl
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
 
-  tf-destroy:
+  tf-target-destroy:
     needs: tf-init
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        destroy_targets: ${{ fromJSON(inputs.destroy_targets || vars.destroy_targets)}}
+    steps:
+      - name: Target destroy resources
+        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform destroy --target '${{ matrix.destroy_targets }}' --auto-approve
+          
+  tf-destroy:
+    needs: tf-target-destroy
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
