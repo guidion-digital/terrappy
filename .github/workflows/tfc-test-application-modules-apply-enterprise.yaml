@@ -39,8 +39,6 @@ jobs:
   deploy:
     needs: terraform-file-changes
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
-    concurrency:
-      group: ${{ github.ref_name }}
     secrets: inherit
     permissions:
       issues: write
