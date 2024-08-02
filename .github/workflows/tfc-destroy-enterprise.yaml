@@ -51,6 +51,7 @@ jobs:
   tf-init:
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
+    environment: ${{ inputs.environment_name }}
     steps:
       - name: Create folder for init files
         run: mkdir -p ${{ inputs.working_directory || vars.working_directory }}
