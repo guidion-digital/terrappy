@@ -53,8 +53,16 @@ jobs:
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     environment: ${{ inputs.environment_name }}
     steps:
-      - name: Create folder for init files
-        run: mkdir -p ${{ inputs.working_directory || vars.working_directory }}
+      - uses: actions/checkout@v4
+      # - name: Archive artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: build-and-terraform
+      #     path: |
+      #       **/*.tf
+      #     retention-days: 2
+      # - name: Create folder for init files
+      #   run: mkdir -p ${{ inputs.working_directory || vars.working_directory }}
       - name: Add backend.tf
         working-directory: ${{ inputs.working_directory || vars.working_directory }}
         run: |
@@ -72,6 +80,7 @@ jobs:
           name: build-and-terraform-full-${{ inputs.environment_name }}
           path: |
             **/*.tf
+            **/*.hcl
             **/*.terraform
             **/*.terraform.lock.hcl
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
