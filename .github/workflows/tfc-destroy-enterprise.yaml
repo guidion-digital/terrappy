@@ -38,7 +38,7 @@ on:
         description: "Terraform resources to target for destroy"
         required: false
         type: string
-        default: '["yellow", "green", "black"]'
+        default: ''
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
@@ -78,6 +78,7 @@ jobs:
 
   tf-target-destroy:
     needs: tf-init
+    if: inputs.destroy_targets != '' || vars.destroy_targets != ''
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
