@@ -38,7 +38,7 @@ on:
         description: Name of the directory holding the source to be deployed
         required: false
         type: string
-        default: dist
+        default: examples/**/dist
       destroy_targets:
         description: "Terraform resources to target for destroy"
         required: false
