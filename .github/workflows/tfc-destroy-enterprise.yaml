@@ -90,7 +90,7 @@ jobs:
           
   tf-destroy:
     needs: tf-target-destroy
-    if: needs.tf-target-destroy.result != 'failed'
+    if: ${{ !cancelled()  && needs.tf-target-destroy.result != 'failed' }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
