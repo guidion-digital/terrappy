@@ -50,8 +50,6 @@ on:
 jobs:
   terraform-file-changes:
     runs-on: ubuntu-latest
-    # permissions:
-    #   pull-requests: read
     outputs:
       result: ${{ steps.terraform-file-changes.outputs.terraform }}
     steps:
