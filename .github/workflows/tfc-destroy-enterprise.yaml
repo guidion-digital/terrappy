@@ -34,6 +34,11 @@ on:
         required: false
         type: number
         default: 360
+      source_dir:
+        description: Name of the directory holding the source to be deployed
+        required: false
+        type: string
+        default: dist
       destroy_targets:
         description: "Terraform resources to target for destroy"
         required: false
@@ -83,6 +88,7 @@ jobs:
             **/*.hcl
             **/*.terraform
             **/*.terraform.lock.hcl
+            ${{ inputs.source_dir || vars.source_dir }}
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
 
   tf-target-destroy:
