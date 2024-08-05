@@ -80,12 +80,19 @@ jobs:
     needs: tf-init
     if: inputs.destroy_targets != '' || vars.destroy_targets != ''
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment_name }}
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     strategy:
       max-parallel: 1
       matrix:
         destroy_targets: ${{ fromJSON(inputs.destroy_targets || vars.destroy_targets)}}
     steps:
+      - name: Get the build artifacts and Terraform files
+        uses: actions/download-artifact@v4
+        with:
+          name: build-and-terraform-full-${{ inputs.environment_name }}
       - name: Target destroy resources
+        working-directory: ${{ inputs.working_directory || vars.working_directory }}
         run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform destroy --target '${{ matrix.destroy_targets }}' --auto-approve
           
   tf-destroy:
