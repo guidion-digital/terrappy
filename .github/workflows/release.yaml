@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - acc
+      - master
 
 jobs:
   # Merges acc into master and release new tag for the workflow
