@@ -6,14 +6,8 @@ on:
       - master
 
 jobs:
-  # Merges acc into master and release new tag for the workflow
-  merge-into-master:
-    uses: guidion-digital/release-workflows/.github/workflows/github-merge-into-master.yaml@release-workflows
-    permissions:
-      contents: write
-
+  # release new tag for the workflow
   release-module-version:
-    needs: [merge-into-master]
     uses: guidion-digital/release-workflows/.github/workflows/github-release-tag.yaml@release-workflows
     permissions:
       contents: write
