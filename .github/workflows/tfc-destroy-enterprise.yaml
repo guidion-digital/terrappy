@@ -34,6 +34,16 @@ on:
         required: false
         type: number
         default: 360
+      source_dir:
+        description: Name of the directory holding the source to be deployed
+        required: false
+        type: string
+        default: examples/**/dist
+      destroy_targets:
+        description: "Terraform resources to target for destroy"
+        required: false
+        type: string
+        default: ''
     secrets:
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
@@ -46,9 +56,9 @@ jobs:
   tf-init:
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
+    environment: ${{ inputs.environment_name }}
     steps:
-      - name: Create folder for init files
-        run: mkdir -p ${{ inputs.working_directory || vars.working_directory }}
+      - uses: actions/checkout@v4
       - name: Add backend.tf
         working-directory: ${{ inputs.working_directory || vars.working_directory }}
         run: |
@@ -66,12 +76,34 @@ jobs:
           name: build-and-terraform-full-${{ inputs.environment_name }}
           path: |
             **/*.tf
+            **/*.hcl
             **/*.terraform
             **/*.terraform.lock.hcl
+            ${{ inputs.source_dir || vars.source_dir }}
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
 
-  tf-destroy:
+  tf-target-destroy:
     needs: tf-init
+    if: inputs.destroy_targets != '' || vars.destroy_targets != ''
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment_name }}
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
+    strategy:
+      max-parallel: 1
+      matrix:
+        destroy_targets: ${{ fromJSON(inputs.destroy_targets || vars.destroy_targets)}}
+    steps:
+      - name: Get the build artifacts and Terraform files
+        uses: actions/download-artifact@v4
+        with:
+          name: build-and-terraform-full-${{ inputs.environment_name }}
+      - name: Target destroy resources
+        working-directory: ${{ inputs.working_directory || vars.working_directory }}
+        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform destroy --target '${{ matrix.destroy_targets }}' --auto-approve
+          
+  tf-destroy:
+    needs: tf-target-destroy
+    if: ${{ !cancelled() && needs.tf-target-destroy.result != 'failed' }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0

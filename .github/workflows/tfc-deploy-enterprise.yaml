@@ -165,6 +165,8 @@ jobs:
   tf-apply:
     needs: tf-plan
     runs-on: ubuntu-latest
+    outputs:
+      tf-apply-result: ${{ needs.tf-apply.result }}
     environment: ${{ inputs.environment_name }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     if: ${{ !cancelled() }}

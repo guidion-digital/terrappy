@@ -1,0 +1,14 @@
+name: Test
+
+on:
+  pull_request:
+    types: 
+      - opened
+      - edited
+      - synchronize
+    branches:
+      - master
+
+jobs:
+  release-dry-run:
+    uses: guidion-digital/release-workflows/.github/workflows/github-release-tag-dry-run.yaml@release-workflows

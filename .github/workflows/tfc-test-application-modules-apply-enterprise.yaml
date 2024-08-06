@@ -1,0 +1,79 @@
+name: Tests applies and releases new version
+
+on:
+  workflow_call:
+    inputs:
+      tfc_workspace:
+        description: Name of the TFC workspace we're using
+        required: false
+        type: string
+      source_dir:
+        description: Name of the directory holding the source to be deployed
+        required: false
+        type: string
+        default: dist
+    outputs:
+      terraform-file-changes-result:
+        description: "Output from terraform-file-changes GH Actions"
+        value: ${{ jobs.terraform-file-changes.outputs.result }}
+      terraform-deploy-result:
+        description: "Output wether job is is succesful or not"
+        value: ${{ jobs.completed.outputs.deploy-result }}
+
+jobs:
+  terraform-file-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.terraform-file-changes.outputs.terraform }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: terraform-file-changes
+      with:
+        filters: |
+          terraform:
+            - '**/*.tf'
+
+  build:
+    needs: terraform-file-changes
+    if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
+    concurrency:
+      group: ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-and-terraform
+          path: |
+            **/*.tf
+          retention-days: 2
+
+  deploy:
+    needs: build
+    secrets: inherit
+    permissions:
+      issues: write
+      contents: read
+      pull-requests: write
+      actions: read
+    uses: guidion-digital/terrappy/.github/workflows/tfc-deploy-enterprise.yaml@test-if-statement
+    with:
+      environment_name: ${{ github.ref_name }}
+      tfc_workspace: ${{ inputs.tfc_workspace || vars.tfc_workspace }}
+      source_dir: ${{ inputs.source_dir || vars.source_dir }}
+
+  # This is needed because skipped tests are marked as succesfull in GitHub required test, we test here if it was succesfully run and then mark it as such, if it's skipped or fails then it's marked as failed.
+  completed:
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    needs: [terraform-file-changes, deploy]
+    outputs:
+      deploy-result: ${{ needs.deploy.result }}
+    steps:
+      - id: workflow-or-terraform-change
+        if: ${{ (needs.terraform-file-changes.outputs.result == 'false')  || (needs.deploy.result  == 'success') }}
+        run: exit 0
+      - if: failure() || steps.workflow-or-terraform-change.outcome != 'success'
+        run: exit 1
