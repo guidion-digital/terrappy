@@ -10,6 +10,8 @@ jobs:
     uses: guidion-digital/release-workflows/.github/workflows/github-release-tag.yaml@v1
     permissions:
       contents: write
+    with:
+      branch: ${{ github.ref_name }}
 
   retagging:
     needs: release-tag
