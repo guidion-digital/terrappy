@@ -3,7 +3,6 @@ on:
     inputs:
       environment_name:
         description: The Github environment to deploy to.
-        required: true
         type: string
         default: 'localstack'
     outputs:
