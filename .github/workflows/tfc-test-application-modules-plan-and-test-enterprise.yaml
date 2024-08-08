@@ -29,11 +29,6 @@ on:
         required: false
         type: string
         default: examples/**/dist
-      retention-days:
-        description: How long to store artifacts
-        required: false
-        type: number
-        default: 2
       approval_timeout:
         description: How long the approval step will wait before timeing out
         required: false
@@ -74,7 +69,7 @@ jobs:
           name: build-and-terraform
           path: |
             **/*.tf
-          retention-days: ${{ inputs.retention-days || vars.retention-days }}
+          retention-days: 1
 
   tf-init:
     needs: build
@@ -104,7 +99,7 @@ jobs:
             **/*.terraform
             **/*.terraform.lock.hcl
             ${{ inputs.source_dir || vars.source_dir }}
-          retention-days: ${{ inputs.retention-days || vars.retention-days }}
+          retention-days: 1
 
   tf-test:
     needs: tf-init
