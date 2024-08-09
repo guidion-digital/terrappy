@@ -6,14 +6,17 @@ on:
       - master
 
 jobs:
-  # Merges acc into master and release new tag for the workflow
-  merge-into-master:
-    uses: guidion-digital/release-workflows/.github/workflows/github-merge-into-master.yaml@release-workflows
+  release-tag:
+    uses: guidion-digital/release-workflows/.github/workflows/github-release-tag.yaml@v1
     permissions:
       contents: write
+    with:
+      branch: ${{ github.ref_name }}
 
-  release-module-version:
-    needs: [merge-into-master]
-    uses: guidion-digital/release-workflows/.github/workflows/github-release-tag.yaml@release-workflows
+  retagging:
+    needs: release-tag
+    uses: guidion-digital/release-workflows/.github/workflows/github-release-tag-update-latest-major.yaml@v1
     permissions:
       contents: write
+    with:
+      new_tag: ${{ needs.release-tag.outputs.new_tag }}

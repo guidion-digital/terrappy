@@ -3,7 +3,6 @@ on:
     inputs:
       environment_name:
         description: The Github environment to deploy to.
-        required: true
         type: string
         default: 'localstack'
     outputs:
@@ -36,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
       - id: set-matrix
         working-directory: ./examples
-        run: echo "matrix=$(ls | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
+        run: echo "matrix=$(find -- * -type d | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       
