@@ -29,11 +29,6 @@ on:
         required: false
         type: string
         default: examples/**/dist
-      retention-days:
-        description: How long to store artifacts
-        required: false
-        type: number
-        default: 2
       approval_timeout:
         description: How long the approval step will wait before timeing out
         required: false
@@ -46,6 +41,13 @@ on:
       tfc_planner_api_token:
         description: Token used to talk to Terraform Cloud for plans
         required: true
+      tfc_api_token_networking:
+        description: Token used to talk get information from the networking workspace in Terraform Cloud
+        required: false
+      tf_test_aws_secret_access_key:
+        description: AWS secret access key to run terraform tests on AWS
+        required: true
+
 
 jobs:
   terraform-file-changes:
@@ -74,7 +76,7 @@ jobs:
           name: build-and-terraform
           path: |
             **/*.tf
-          retention-days: 2
+          retention-days: 1
 
   tf-init:
     needs: build
@@ -104,7 +106,7 @@ jobs:
             **/*.terraform
             **/*.terraform.lock.hcl
             ${{ inputs.source_dir || vars.source_dir }}
-          retention-days: ${{ inputs.retention-days || vars.retention-days }}
+          retention-days: 1
 
   tf-test:
     needs: tf-init
@@ -120,8 +122,8 @@ jobs:
           chmod -R a+x .terraform
       - name: test
         env:
-          AWS_ACCESS_KEY_ID: ${{ vars.TF_TEST_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_TEST_AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ vars.tf_test_aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.tf_test_aws_secret_access_key }}
           TFE_TOKEN: ${{ secrets.tfc_api_token_networking || secrets.tfc_api_token || secrets.tfc_planner_api_token }}
         run: |
           terraform test
