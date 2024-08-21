@@ -37,8 +37,6 @@ jobs:
   build:
     needs: terraform-file-changes
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
-    concurrency:
-      group: ${{ github.ref_name }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
