@@ -74,6 +74,7 @@ jobs:
           name: build-and-terraform
           path: |
             **/*.tf
+            ${{ inputs.source_dir || vars.source_dir }}
           retention-days: 1
 
   tf-init:

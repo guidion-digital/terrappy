@@ -11,7 +11,7 @@ on:
         description: Name of the directory holding the source to be deployed
         required: false
         type: string
-        default: dist
+        default: examples/**/dist
     outputs:
       terraform-file-changes-result:
         description: "Output from terraform-file-changes GH Actions"
@@ -46,6 +46,7 @@ jobs:
           name: build-and-terraform
           path: |
             **/*.tf
+            ${{ inputs.source_dir || vars.source_dir }}
           retention-days: 2
 
   deploy:
