@@ -24,13 +24,11 @@ jobs:
       steps:
         - uses: actions/checkout@v4
         - name: Install Terraform
-          run: |
-            brew install terraform@1.6.5
+          run: apt install terraform=1.6.5
 
       # Run init to get module code to be able to use `--call-module-type=all`
         - name: Terraform init
-          run: |
-            terraform init
+          run: terraform init
 
         - uses: reviewdog/action-tflint@v1
           with:
