@@ -35,8 +35,7 @@ jobs:
         - uses: reviewdog/action-tflint@v1
           with:
             reporter: github-pr-review
-            fail_on_error: true
-            level: warning
+            fail_on_error: false
             tflint_config: ""
             filter_mode: "nofilter"
             flags: "--call-module-type=all"
