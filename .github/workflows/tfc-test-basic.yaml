@@ -36,3 +36,5 @@ jobs:
           with:
             reporter: github-pr-review
             fail_on_error: true
+            filter_mode: "nofilter"
+            flags: "--call-module-type=all"
