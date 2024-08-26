@@ -23,8 +23,10 @@ jobs:
         pull-requests: write
       steps:
         - uses: actions/checkout@v4
-        - name: Install Terraform
-          run: apt install terraform=1.6.5
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v2
+          with:
+            terraform_version: 1.6.5
 
       # Run init to get module code to be able to use `--call-module-type=all`
         - name: Terraform init
