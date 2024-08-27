@@ -6,9 +6,12 @@ on:
       terraform-file-changes-result:
         description: "Output from terraform-file-changes GH Actions"
         value: ${{ jobs.terraform-file-changes.outputs.result }}
-    #   terraform-deploy-result:
-    #     description: "Output wether job is is succesful or not"
-    #     value: ${{ jobs.completed.outputs.deploy-result }}
+      terraform-validate-result:
+        description: "Output wether job is is succesful or not"
+        value: ${{ jobs.completed.outputs.validate-result }}
+      terraform-lint-result:
+        description: "Output wether job is is succesful or not"
+        value: ${{ jobs.completed.outputs.lint-result }}
 
 jobs:
   terraform-file-changes:
@@ -45,8 +48,9 @@ jobs:
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     needs: [terraform-file-changes, validate, lint]
-    # outputs:
-    #   deploy-result: ${{ needs.deploy.result }}
+    outputs:
+      validate-result: ${{ needs.validate.result }}
+      lint-result: ${{ needs.lint.result }}
     steps:
       - id: workflow-or-terraform-change
         if: ${{ (needs.terraform-file-changes.outputs.result == 'false')  || (needs.validate.result  == 'success')  && (needs.lint.result  == 'success')}}
