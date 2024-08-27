@@ -6,9 +6,9 @@ on:
       terraform-file-changes-result:
         description: "Output from terraform-file-changes GH Actions"
         value: ${{ jobs.terraform-file-changes.outputs.result }}
-      terraform-deploy-result:
-        description: "Output wether job is is succesful or not"
-        value: ${{ jobs.completed.outputs.deploy-result }}
+    #   terraform-deploy-result:
+    #     description: "Output wether job is is succesful or not"
+    #     value: ${{ jobs.completed.outputs.deploy-result }}
 
 jobs:
   terraform-file-changes:
