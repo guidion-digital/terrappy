@@ -22,7 +22,8 @@ jobs:
       with:
         filters: |
           terraform:
-  
+            - '**/*.tf'
+
   validate:
     needs: terraform-file-changes
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
