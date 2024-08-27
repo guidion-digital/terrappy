@@ -32,16 +32,16 @@ jobs:
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
     uses: ./.github/workflows/tfc-test-validate.yaml
     permissions:
-        contents: read
-        pull-requests: write
+      contents: read
+      pull-requests: write
 
   lint:
     needs: terraform-file-changes
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
     uses: ./.github/workflows/tfc-test-lint.yaml
     permissions:
-        contents: read
-        pull-requests: write
+      contents: read
+      pull-requests: write
 
   # This is needed because skipped tests are marked as succesfull in GitHub required test, we test here if it was succesfully run and then mark it as such, if it's skipped or fails then it's marked as failed.
   completed:
