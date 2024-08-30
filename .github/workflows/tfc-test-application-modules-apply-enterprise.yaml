@@ -57,7 +57,7 @@ jobs:
       contents: read
       pull-requests: write
       actions: read
-    uses: guidion-digital/terrappy/.github/workflows/tfc-deploy-enterprise.yaml@test-if-statement
+    uses: ./.github/workflows/tfc-deploy-enterprise.yaml
     with:
       environment_name: ${{ github.ref_name }}
       tfc_workspace: ${{ inputs.tfc_workspace || vars.tfc_workspace }}

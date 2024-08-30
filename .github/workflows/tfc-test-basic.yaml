@@ -1,0 +1,59 @@
+name: Tests Terraform code with validate and linting
+
+on:
+  workflow_call:
+    outputs:
+      terraform-file-changes-result:
+        description: "Output from terraform-file-changes GH Actions"
+        value: ${{ jobs.terraform-file-changes.outputs.result }}
+      terraform-validate-result:
+        description: "Output wether job is is succesful or not"
+        value: ${{ jobs.completed.outputs.validate-result }}
+      terraform-lint-result:
+        description: "Output wether job is is succesful or not"
+        value: ${{ jobs.completed.outputs.lint-result }}
+
+jobs:
+  terraform-file-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.terraform-file-changes.outputs.terraform }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: terraform-file-changes
+      with:
+        filters: |
+          terraform:
+            - '**/*.tf'
+
+  validate:
+    needs: terraform-file-changes
+    if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
+    uses: ./.github/workflows/tfc-test-validate.yaml
+    permissions:
+      contents: read
+      pull-requests: write
+
+  lint:
+    needs: terraform-file-changes
+    if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
+    uses: ./.github/workflows/tfc-test-lint.yaml
+    permissions:
+      contents: read
+      pull-requests: write
+
+  # This is needed because skipped tests are marked as succesfull in GitHub required test, we test here if it was succesfully run and then mark it as such, if it's skipped or fails then it's marked as failed.
+  completed:
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    needs: [terraform-file-changes, validate, lint]
+    outputs:
+      validate-result: ${{ needs.validate.result }}
+      lint-result: ${{ needs.lint.result }}
+    steps:
+      - id: workflow-or-terraform-change
+        if: ${{ (needs.terraform-file-changes.outputs.result == 'false')  || (needs.validate.result  == 'success')  && (needs.lint.result  == 'success')}}
+        run: exit 0
+      - if: failure() || steps.workflow-or-terraform-change.outcome != 'success'
+        run: exit 1
