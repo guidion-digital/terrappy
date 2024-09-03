@@ -108,6 +108,7 @@ jobs:
             **/*.terraform
             **/*.terraform.lock.hcl
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
+          include-hidden-files: true
 
   check-deployment-policies:
     needs: tf-init

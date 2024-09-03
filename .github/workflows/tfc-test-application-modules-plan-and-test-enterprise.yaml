@@ -76,6 +76,7 @@ jobs:
             **/*.tf
             ${{ inputs.source_dir || vars.source_dir }}
           retention-days: 1
+          include-hidden-files: true
 
   tf-init:
     needs: build
@@ -106,6 +107,7 @@ jobs:
             **/*.terraform.lock.hcl
             ${{ inputs.source_dir || vars.source_dir }}
           retention-days: 1
+          include-hidden-files: true
 
   tf-test:
     needs: tf-init

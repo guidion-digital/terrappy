@@ -48,6 +48,7 @@ jobs:
             **/*.tf
             ${{ inputs.source_dir || vars.source_dir }}
           retention-days: 2
+          include-hidden-files: true
 
   deploy:
     needs: build

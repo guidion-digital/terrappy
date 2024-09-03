@@ -81,6 +81,7 @@ jobs:
             **/*.terraform.lock.hcl
             ${{ inputs.source_dir || vars.source_dir }}
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
+          include-hidden-files: true
 
   tf-target-destroy:
     needs: tf-init
@@ -100,7 +101,7 @@ jobs:
       - name: Target destroy resources
         working-directory: ${{ inputs.working_directory || vars.working_directory }}
         run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform destroy --target '${{ matrix.destroy_targets }}' --auto-approve
-          
+
   tf-destroy:
     needs: tf-target-destroy
     if: ${{ !cancelled() && needs.tf-target-destroy.result != 'failed' }}

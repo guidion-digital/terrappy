@@ -104,6 +104,7 @@ jobs:
             **/*.terraform
             **/*.terraform.lock.hcl
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
+          include-hidden-files: true
   tf-plan:
     # We can't use if at this level because of this bug in Github Actions:
     # https://github.com/orgs/community/discussions/113313
