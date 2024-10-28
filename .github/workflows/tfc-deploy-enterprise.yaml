@@ -83,7 +83,7 @@ on:
 jobs:
   tf-init:
     runs-on: ubuntu-latest
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.2
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -130,7 +130,7 @@ jobs:
     if: ${{ needs.check-deployment-policies.outputs.reviewers != null }}
     needs: check-deployment-policies
     runs-on: ubuntu-latest
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.2
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -169,7 +169,7 @@ jobs:
     outputs:
       tf-apply-result: ${{ needs.tf-apply.result }}
     environment: ${{ inputs.environment_name }}
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.2
     if: ${{ !cancelled() }}
     steps:
         # This first step allows us to specify the plan job above in "needs",
