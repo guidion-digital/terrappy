@@ -80,6 +80,7 @@ jobs:
 
   tf-init:
     needs: build
+    environment: ${{ inputs.environment_name }}
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
@@ -131,6 +132,7 @@ jobs:
 
   tf-plan:
     needs: tf-init
+    environment: ${{ inputs.environment_name }}
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
     steps:
