@@ -6,16 +6,15 @@ on:
         required: false
   
 jobs:
-    reviewdog-tf-validate:
-      runs-on: ubuntu-latest
-      permissions:
-        contents: read
-        pull-requests: write
-      steps:
-        - uses: actions/checkout@v4
-        - uses: reviewdog/action-terraform-validate@v1
-          with:
-            reporter: github-pr-review
-            terraform_version: 1.6.5
-          env:
-            TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}
+  reviewdog-tf-validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: reviewdog/action-terraform-validate@v1
+        with:
+          reporter: github-pr-review
+          terraform_version: 1.6.1
+          terraform_cloud_token: ${{ secrets.tfc_planner_api_token }}
