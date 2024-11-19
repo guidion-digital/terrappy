@@ -1,5 +1,11 @@
 on:
   workflow_call:
+    inputs:
+      fail-on-error-lint:
+        description: Wether to fail on a warning found in tf-lint
+        required: false
+        type: boolean
+        default: true
     secrets:
       tfc_planner_api_token:
         description: Token used to retreieve private modules from Terraform Cloud
@@ -16,7 +22,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.6.5
+          terraform_version: 1.6.1
         # Run init to get module code to be able to use `--call-module-type=all`
       - name: Terraform init
         run: terraform init
