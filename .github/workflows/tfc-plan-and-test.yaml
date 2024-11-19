@@ -74,26 +74,8 @@ jobs:
           terraform:
             - '**/*.tf'
 
-  validate:
-    needs: terraform-file-changes
-    if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
-    secrets: inherit
-    uses: ./.github/workflows/tfc-test-validate.yaml
-    permissions:
-      contents: read
-      pull-requests: write
-
-  lint:
-    needs: terraform-file-changes
-    if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
-    secrets: inherit
-    uses: ./.github/workflows/tfc-test-lint.yaml
-    permissions:
-      contents: read
-      pull-requests: write
-
   tf-init:
-    needs: [terraform-file-changes, lint]
+    needs: [terraform-file-changes]
     runs-on: ubuntu-latest
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
     permissions:
@@ -126,8 +108,26 @@ jobs:
           retention-days: ${{ inputs.retention-days || vars.retention-days }}
           include-hidden-files: true
 
-  tf-plan:
+  validate:
     needs: [terraform-file-changes, tf-init]
+    if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
+    secrets: inherit
+    uses: ./.github/workflows/tfc-test-validate.yaml
+    permissions:
+      contents: read
+      pull-requests: write
+
+  lint:
+    needs: [terraform-file-changes, tf-init]
+    if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
+    secrets: inherit
+    uses: ./.github/workflows/tfc-test-lint.yaml
+    permissions:
+      contents: read
+      pull-requests: write
+
+  tf-plan:
+    needs: [terraform-file-changes, validate, lint]
     runs-on: ubuntu-latest
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.2
