@@ -83,10 +83,7 @@ jobs:
       pull-requests: write
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.2
     steps:
-      - name: Get the build artifacts and Terraform files
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.artifact_name || vars.artifact_name }}
+      - uses: actions/checkout@v4
       - name: Add backend.tf
         run: |
           echo "terraform {
