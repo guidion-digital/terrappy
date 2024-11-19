@@ -1,5 +1,9 @@
 on:
   workflow_call:
+    secrets:
+      tfc_planner_api_token:
+        description: Token used to retreieve private modules from Terraform Cloud
+        required: false
   
 jobs:
     reviewdog-tf-validate:
@@ -13,3 +17,5 @@ jobs:
           with:
             reporter: github-pr-review
             terraform_version: 1.6.5
+          env:
+            TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}

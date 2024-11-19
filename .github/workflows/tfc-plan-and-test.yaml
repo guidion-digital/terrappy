@@ -77,22 +77,20 @@ jobs:
   validate:
     needs: terraform-file-changes
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
+    secrets: inherit
     uses: ./.github/workflows/tfc-test-validate.yaml
     permissions:
       contents: read
       pull-requests: write
-    env:
-      TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}
 
   lint:
     needs: terraform-file-changes
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
+    secrets: inherit
     uses: ./.github/workflows/tfc-test-lint.yaml
     permissions:
       contents: read
       pull-requests: write
-    env:
-      TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}
 
   tf-init:
     needs: [terraform-file-changes, lint]
