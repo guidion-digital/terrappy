@@ -81,6 +81,8 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}
 
   lint:
     needs: terraform-file-changes
@@ -89,6 +91,8 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}
 
   tf-init:
     needs: [terraform-file-changes, lint]
