@@ -84,6 +84,8 @@ jobs:
   tf-init:
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
+    env:
+      TF_VAR_container_sha: ${{ github.sha }}
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -131,6 +133,8 @@ jobs:
     needs: check-deployment-policies
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
+    env:
+      TF_VAR_container_sha: ${{ github.sha }}
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -166,6 +170,8 @@ jobs:
   tf-apply:
     needs: tf-plan
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_container_sha: ${{ github.sha }}
     outputs:
       tf-apply-result: ${{ needs.tf-apply.result }}
     environment: ${{ inputs.environment_name }}
