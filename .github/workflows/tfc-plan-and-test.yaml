@@ -42,11 +42,6 @@ on:
         required: false
         type: number
         default: 2
-      environment_variable:
-        description: Additional arguments
-        required: false
-        type: string
-        default: ''
     secrets:
       tfc_planner_api_token:
         description: Token used to talk to Terraform Cloud for plans
