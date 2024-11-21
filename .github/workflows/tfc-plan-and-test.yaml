@@ -99,8 +99,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    env:
-      TF_VAR_container_sha: ${{ github.sha }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.2
     steps:
       - uses: actions/checkout@v4
@@ -112,7 +110,12 @@ jobs:
             }
           }" > backend.tf
       - name: init
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform init
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace }}
+          TF_VAR_commit_sha: ${{ github.sha }}
+        run: terraform init
       - name: Upload Terraform files and build
         uses: actions/upload-artifact@v4
         with:
@@ -130,16 +133,19 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.2
-    env:
-      TF_VAR_container_sha: ${{ github.sha }}
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
           name: build-and-terraform-full
       - name: plan
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace }}
+          TF_VAR_commit_sha: ${{ github.sha }}
         run: |
-          TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform plan
+          terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
 
   # This is needed because skipped tests are marked as succesfull in GitHub required test, we test here if it was succesfully run and then mark it as such, if it's skipped or fails then it's marked as failed.

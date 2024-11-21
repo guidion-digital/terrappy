@@ -84,8 +84,6 @@ jobs:
   tf-init:
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
-    env:
-      TF_VAR_container_sha: ${{ github.sha }}
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -99,7 +97,12 @@ jobs:
             }
           }" > backend.tf
       - name: init
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform init
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace || vars.tfc_workspace }}
+          TF_VAR_commit_sha: ${{ github.sha }}
+        run: terraform init
       - name: Upload Terraform files and build
         uses: actions/upload-artifact@v4
         with:
@@ -133,16 +136,19 @@ jobs:
     needs: check-deployment-policies
     runs-on: ubuntu-latest
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
-    env:
-      TF_VAR_container_sha: ${{ github.sha }}
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
         with:
           name: build-and-terraform-full
       - name: plan
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace }}
+          TF_VAR_commit_sha: ${{ github.sha }}
         run: |
-          TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform plan
+            terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
       - name: Notify devs
         run: |
@@ -170,8 +176,6 @@ jobs:
   tf-apply:
     needs: tf-plan
     runs-on: ubuntu-latest
-    env:
-      TF_VAR_container_sha: ${{ github.sha }}
     outputs:
       tf-apply-result: ${{ needs.tf-apply.result }}
     environment: ${{ inputs.environment_name }}
@@ -193,4 +197,9 @@ jobs:
         with:
           name: build-and-terraform-full
       - name: Run terraform apply with auto-approval
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform apply -auto-approve
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace || vars.tfc_workspace  }}
+          TF_VAR_commit_sha: ${{ github.sha }}
+        run: terraform apply -auto-approve
