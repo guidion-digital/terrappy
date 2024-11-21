@@ -42,6 +42,11 @@ on:
         required: false
         type: number
         default: 2
+      environment_variable:
+        description: Additional arguments
+        required: false
+        type: string
+        default: ''
     secrets:
       tfc_planner_api_token:
         description: Token used to talk to Terraform Cloud for plans
@@ -99,6 +104,8 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    env:
+      TF_VAR_containersha: ${{ inputs.environment_variable }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.2
     steps:
       - uses: actions/checkout@v4
@@ -128,6 +135,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.2
+    env:
+      TF_VAR_containersha: ${{ inputs.environment_variable }}
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
