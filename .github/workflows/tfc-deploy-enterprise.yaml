@@ -73,6 +73,9 @@ on:
         type: string
         default: production-deploys
     secrets:
+      slack_token:
+        description: Token used to post message to Slack
+        required: false
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
         required: false
@@ -149,7 +152,7 @@ jobs:
           TF_VAR_commit_sha: ${{ github.sha }}
         run: |
             terraform plan
-          echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
+            echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
       - name: Notify devs
         run: |
           curl -H "Content-type: application/json" \
