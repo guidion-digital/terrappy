@@ -96,7 +96,11 @@ jobs:
             }
           }" > backend.tf
       - name: init
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform init
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace || vars.tfc_workspace  }}
+        run: terraform init
       - name: Upload Terraform files and build
         uses: actions/upload-artifact@v4
         with:
@@ -141,8 +145,12 @@ jobs:
         with:
           name: build-and-terraform-full
       - name: plan
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace || vars.tfc_workspace  }}
         run: |
-          TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform plan
+          terraform plan
           echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
 
   # This is needed because skipped tests are marked as succesfull in GitHub required test, we test here if it was succesfully run and then mark it as such, if it's skipped or fails then it's marked as failed.
