@@ -14,11 +14,6 @@
 on:
   workflow_call:
     inputs:
-      environment_name:
-        description: The Github environment containing all the variables needed
-        required: false
-        type: string
-        default: ''
       tfc_organization:
         description: Name of the TFC organization you're deploying to
         required: false
