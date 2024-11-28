@@ -16,7 +16,7 @@ jobs:
       pull-requests: write
       contents: read
     with:
-      actionlint_flags: -ignore configuration variable name
+      actionlint_flags: "-ignore configuration variable name"
        
 
   test-release-tag:
