@@ -16,7 +16,7 @@ jobs:
       pull-requests: write
       contents: read
     with:
-      actionlint_flags: -ignore 'type of expression at ".+"" must be number but found type string'
+      actionlint_flags: -ignore 'configuration variable name "retention-days" can only contain alphabets, decimal numbers, and'
        
 
   test-release-tag:
