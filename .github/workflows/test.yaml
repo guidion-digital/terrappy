@@ -16,7 +16,8 @@ jobs:
       pull-requests: write
       contents: read
     with:
-      actionlint_flags: -config-file .github/actionlint.yaml
+      actionlint_flags: -config-file '.github/actionlint.yaml'
+       
 
   test-release-tag:
     needs: test-workflow

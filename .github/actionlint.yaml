@@ -7,5 +7,5 @@ paths:
       # - 'shellcheck reported issue in this script: SC2086:.+'
       # - 'the runner of ".+" action is too old to run on GitHub Actions'
       - 'configuration variable name "retention-days" can only contain alphabets, decimal numbers, and.+'
-      - configuration variable name ".+" can only contain alphabets, decimal numbers, and
-      - '".+"'
+      - 'configuration variable name ".+" can only contain alphabets, decimal numbers, and'
+      - 'configuration variable name .+ can only contain alphabets, decimal numbers, and.+'
