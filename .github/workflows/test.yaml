@@ -16,7 +16,7 @@ jobs:
       pull-requests: write
       contents: read
     with:
-      actionlint_flags: '-config-file .github/actionlint.yaml'
+      actionlint_flags: -ignore 'type of expression at "float number value" must be number but found type string [expression]'
        
 
   test-release-tag:
