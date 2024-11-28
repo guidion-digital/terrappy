@@ -16,7 +16,7 @@ jobs:
       pull-requests: write
       contents: read
     with:
-      actionlint_flags: -ignore 'configuration variable name "retention-days" can only contain alphabets, decimal numbers, and'
+      actionlint_flags: -ignore 'configuration variable name .+ can only contain alphabets, decimal numbers, and'
        
 
   test-release-tag:
