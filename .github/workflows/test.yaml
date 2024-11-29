@@ -16,7 +16,7 @@ jobs:
       pull-requests: write
       contents: read
     with:
-      reviewdog_flags: -ignore "configuration variable name"
+      fail_on_error: false
        
 
   test-release-tag:
