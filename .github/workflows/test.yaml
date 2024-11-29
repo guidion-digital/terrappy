@@ -17,6 +17,7 @@ jobs:
       contents: read
     with:
       fail_on_error: false
+      actionlint_flags: -config-file '.github/actionlint.yaml'
        
 
   test-release-tag:
