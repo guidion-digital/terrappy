@@ -6,26 +6,32 @@ on:
         required: false
         type: boolean
         default: true
+    secrets:
+      tfc_planner_api_token:
+        description: Token used to retreieve private modules from Terraform Cloud
+        required: false
   
 jobs:
-    reviewdog-tflint:
-      runs-on: ubuntu-latest
-      permissions:
-        contents: read
-        pull-requests: write
-      steps:
-        - uses: actions/checkout@v4
-        - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v3
-          with:
-            terraform_version: 1.6.5
-          # Run init to get module code to be able to use `--call-module-type=all`
-        - name: Terraform init
-          run: terraform init
-        - uses: reviewdog/action-tflint@v1
-          with:
-            reporter: github-pr-review
-            fail_on_error: ${{ inputs.fail-on-error-lint }}
-            tflint_config: "" # Needed because default is set to config file, tflint 0.50 fails if config is supplied but can't be found.
-            filter_mode: "nofilter"
-            flags: "--call-module-type=all"
+  reviewdog-tflint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.1
+        # Run init to get module code to be able to use `--call-module-type=all`
+      - name: Terraform init
+        run: terraform init
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}
+      - uses: reviewdog/action-tflint@v1
+        with:
+          reporter: github-pr-review
+          fail_on_error: ${{ inputs.fail-on-error-lint }}
+          tflint_config: "" # Needed because default is set to config file, tflint 0.50 fails if config is supplied but can't be found.
+          filter_mode: "nofilter"
+          flags: "--call-module-type=all"

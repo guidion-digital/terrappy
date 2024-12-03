@@ -11,9 +11,13 @@ on:
 
 jobs:
   test-workflow:
-    uses: guidion-digital/release-workflows/.github/workflows/github-test-workflow.yaml@v1
+    uses: guidion-digital/release-workflows/.github/workflows/github-test-workflow.yaml@v2
     permissions:
       pull-requests: write
+      contents: read
+    with:
+      fail_on_error: false
+       
 
   test-release-tag:
     needs: test-workflow

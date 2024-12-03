@@ -73,6 +73,9 @@ on:
         type: string
         default: production-deploys
     secrets:
+      slack_token:
+        description: Token used to post message to Slack
+        required: false
       tfc_api_token:
         description: Token used to talk to Terraform Cloud
         required: false
@@ -97,7 +100,12 @@ jobs:
             }
           }" > backend.tf
       - name: init
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform init
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace || vars.tfc_workspace }}
+          TF_VAR_commit_sha: ${{ github.sha }}
+        run: terraform init
       - name: Upload Terraform files and build
         uses: actions/upload-artifact@v4
         with:
@@ -137,9 +145,14 @@ jobs:
         with:
           name: build-and-terraform-full
       - name: plan
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace }}
+          TF_VAR_commit_sha: ${{ github.sha }}
         run: |
-          TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace }} terraform plan
-          echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
+            terraform plan
+            echo "WARNING: This is a speculative plan. It may not reflect what you see when running terraform apply"
       - name: Notify devs
         run: |
           curl -H "Content-type: application/json" \
@@ -187,4 +200,9 @@ jobs:
         with:
           name: build-and-terraform-full
       - name: Run terraform apply with auto-approval
-        run: TF_IN_AUTOMATION=true TF_TOKEN_app_terraform_io=${{ secrets.tfc_api_token }} TF_WORKSPACE=${{ inputs.tfc_workspace || vars.tfc_workspace }} terraform apply -auto-approve
+        env:
+          TF_IN_AUTOMATION: true
+          TF_TOKEN_app_terraform_io: ${{ secrets.tfc_api_token }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace || vars.tfc_workspace  }}
+          TF_VAR_commit_sha: ${{ github.sha }}
+        run: terraform apply -auto-approve
