@@ -148,7 +148,7 @@ jobs:
         env:
           TF_IN_AUTOMATION: true
           TF_TOKEN_app_terraform_io: ${{ secrets.tfc_api_token || secrets.tfc_planner_api_token }}
-          TF_WORKSPACE: ${{ inputs.tfc_workspace }}
+          TF_WORKSPACE: ${{ inputs.tfc_workspace || vars.tfc_workspace }}
           TF_VAR_commit_sha: ${{ github.sha }}
         run: |
             terraform plan
