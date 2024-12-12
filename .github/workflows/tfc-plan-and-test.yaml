@@ -48,9 +48,6 @@ on:
       terraform-validate-result:
         description: "Output wether job is is succesful or not"
         value: ${{ jobs.completed.outputs.validate-result }}
-      terraform-lint-result:
-        description: "Output wether job is is succesful or not"
-        value: ${{ jobs.completed.outputs.lint-result }}
       terraform-tf-plan-result:
         description: "Output wether job is is succesful or not"
         value: ${{ jobs.completed.outputs.tf-plan-result }}
@@ -141,11 +138,10 @@ jobs:
     needs: [terraform-file-changes, validate, tf-plan]
     outputs:
       validate-result: ${{ needs.validate.result }}
-      lint-result: ${{ needs.lint.result }}
       tf-plan-result:  ${{ needs.tf-plan.result }}
     steps:
       - id: workflow-or-terraform-change
-        if: ${{ (needs.terraform-file-changes.outputs.result == 'false')  || (needs.validate.result  == 'success')  && (needs.lint.result  == 'success') && (needs.tf-plan.result  == 'success') }}
+        if: ${{ (needs.terraform-file-changes.outputs.result == 'false')  || (needs.validate.result  == 'success')  && (needs.tf-plan.result  == 'success') }}
         run: exit 0
       - if: failure() || steps.workflow-or-terraform-change.outcome != 'success'
         run: exit 1
