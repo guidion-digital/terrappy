@@ -49,12 +49,13 @@ jobs:
           terraform_version: "1.6.4"
       - name: Install tflocal
         run: pip install terraform-local
-      - name: Test API
+      - name: Run Terraform init and plan
         working-directory: ./examples
         run: |
           cd "${{ matrix.folders }}"
           tflocal init
-          tflocal plan
+      - name: Test API
+        run: tflocal plan
 
   # Required because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
   # Skipped tests are marked as succesfull in GitHub, we test here if it was a succesfull run and then mark it as such, if it's skipped or fails then it's marked as failed.
