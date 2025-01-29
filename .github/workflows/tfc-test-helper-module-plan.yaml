@@ -52,10 +52,15 @@ jobs:
       - name: terraform init
         working-directory: ./examples/${{ matrix.folders }}
         run: |
+          pwd
+          ls
           tflocal init
       - name: terraform plan
         working-directory: ./examples/${{ matrix.folders }}
-        run: tflocal plan
+        run: |
+          pwd
+          ls
+          tflocal plan
 
   # Required because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
   # Skipped tests are marked as succesfull in GitHub, we test here if it was a succesfull run and then mark it as such, if it's skipped or fails then it's marked as failed.
