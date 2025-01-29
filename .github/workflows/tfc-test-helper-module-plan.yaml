@@ -49,12 +49,12 @@ jobs:
           terraform_version: "1.6.4"
       - name: Install tflocal
         run: pip install terraform-local
-      - name: Run Terraform init and plan
-        working-directory: ./examples
+      - name: terraform init
+        working-directory: ./examples/${{ matrix.folders }}
         run: |
-          cd "${{ matrix.folders }}"
           tflocal init
-      - name: Test API
+      - name: terraform plan
+        working-directory: ./examples/${{ matrix.folders }}
         run: tflocal plan
 
   # Required because matrix tests have dynamic workflow names based on the folder name. This is something we cannot make a required test from.
