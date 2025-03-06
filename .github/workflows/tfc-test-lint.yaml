@@ -1,11 +1,11 @@
 on:
   workflow_call:
     inputs:
-      fail-on-error-lint:
-        description: Wether to fail on a warning found in tf-lint
+      fail_level:
+        description: 'If set to none, always use exit code 0 for reviewdog. Otherwise, exit code 1 for reviewdog if it finds at least 1 issue with severity greater than or equal to the given level. Possible values: [none, any, info, warning, error]'
         required: false
-        type: boolean
-        default: true
+        type: string
+        default: error
     secrets:
       tfc_planner_api_token:
         description: Token used to retreieve private modules from Terraform Cloud
@@ -31,7 +31,7 @@ jobs:
       - uses: reviewdog/action-tflint@v1
         with:
           reporter: github-pr-review
-          fail_on_error: ${{ inputs.fail-on-error-lint }}
+          fail_level: ${{ inputs.fail_level }}
           tflint_config: "" # Needed because default is set to config file, tflint 0.50 fails if config is supplied but can't be found.
           filter_mode: "nofilter"
           flags: "--call-module-type=all"
