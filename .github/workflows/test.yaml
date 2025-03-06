@@ -15,8 +15,6 @@ jobs:
     permissions:
       pull-requests: write
       contents: read
-    with:
-      fail_on_error: false
        
 
   test-release-tag:
