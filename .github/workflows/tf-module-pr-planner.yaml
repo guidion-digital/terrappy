@@ -34,6 +34,7 @@ jobs:
       contents: read
 
   terraform-file-changes:
+    needs: test-workflow
     runs-on: ubuntu-latest
     outputs:
       result: ${{ steps.terraform-file-changes.outputs.terraform }}
