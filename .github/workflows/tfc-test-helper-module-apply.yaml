@@ -52,6 +52,9 @@ jobs:
         uses: LocalStack/setup-localstack@main
         with:
           image-tag: 'latest'
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.4"
       - name: Install tflocal
         run: pip install terraform-local
       - name: Test API
