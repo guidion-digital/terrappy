@@ -71,6 +71,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: See env values
+        run: printenv
       - name: Terraform init
         run: terraform init
       - name: Run terraform plan with auto-approval
