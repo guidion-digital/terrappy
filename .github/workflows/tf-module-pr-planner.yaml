@@ -94,8 +94,6 @@ jobs:
         run: |
           echo "$ENVIRONMENT_VARIABLES" >> $GITHUB_ENV
           echo "$ENVIRONMENT_SECRETS" >> $GITHUB_ENV
-      - name: See env values
-        run: printenv
       - name: Terraform init
         run: terraform init
       - name: Run terraform plan with auto-approval
