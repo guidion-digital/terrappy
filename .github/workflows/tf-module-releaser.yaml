@@ -1,0 +1,127 @@
+name: Release a version of a module if the terraform apply passes
+
+# Pass secrets and variables to be set in the environment with inputs.environment_variables
+# and secrets.environment_secrets. Both must have items set on newlines, like so:
+#
+# with:
+#   environment_variables: |
+#     EXAMPLE_VARIABLE=${{ vars.example_variable }}
+# secrets:
+#   environment_secrets: |
+#     EXAMPLE_SECRET=${{ secrets.example_secret }}
+#
+# Do not pass secrets down as plaintext values, but rather references to Github
+# secrets, as in the example above. Variables can be passed as plain text
+
+on:
+  workflow_call:
+    inputs:
+      tf_examples_dirs:
+        description: List of directories to test (JSON array format)
+        required: false
+        type: string
+        default: '["examples/test_app"]'
+      destroy:
+        description: Destroy resources. Set to false to stop cleanup at the end of the apply job
+        required: false
+        type: boolean
+        default: true
+      environment:
+        description: Github environment to attach with extra variables
+        required: false
+        type: string
+        default: ""
+      environment_variables:
+        description: Variables to set in the environment (KEY=value format)
+        required: false
+        type: string
+    secrets:
+      environment_secrets:
+        description: Secrets to set in the environment (KEY=value format)
+        required: false
+    outputs:
+      terraform-file-changes-result:
+        description: "Output from terraform-file-changes GH Actions"
+        value: ${{ jobs.terraform-file-changes.outputs.result }}
+
+jobs:
+  terraform-file-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.terraform-file-changes.outputs.terraform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: terraform-file-changes
+        with:
+          filters: |
+            terraform:
+              - '**/*.tf'
+
+  tf-apply:
+    if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
+    needs: [terraform-file-changes]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tf_examples_dirs: ${{ fromJson(inputs.tf_examples_dirs) }}
+      fail-fast: false
+    environment: ${{ inputs.environment }}
+    env:
+      ENVIRONMENT_VARIABLES: ${{ inputs.environment_variables }}
+      ENVIRONMENT_SECRETS: ${{ secrets.environment_secrets }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.tf_examples_dirs }}
+    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Load variables from caller
+        run: |
+          echo "$ENVIRONMENT_VARIABLES" >> "$GITHUB_ENV"
+          echo "$ENVIRONMENT_SECRETS" >> "$GITHUB_ENV"
+      - name: Terraform init
+        run: terraform init
+      - name: Run terraform apply with auto-approval
+        run: terraform apply -auto-approve
+      - name: Destroy all resources
+        if: always() && inputs.destroy
+        run: terraform destroy -auto-approve
+  # This is needed because matrix tests have dynamic workflow names based on the
+  # folder name. This is something we cannot make a required test from. Because
+  # skipped tests are marked as succesfull in GitHub required test, we test here
+  # if it was succesfully run and then mark it as such, if it's skipped or fails
+  # then it's marked as failed.
+  completed:
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    needs: [terraform-file-changes, tf-apply]
+    outputs:
+      tf-apply-result: ${{ needs.tf-apply.result }}
+    steps:
+      - name: No Terraform changes, or Terraform applied successfully
+        id: workflow-or-terraform-change
+        if: ${{ (needs.terraform-file-changes.outputs.result == 'false')  || (needs.tf-apply.result  == 'success') }}
+        run: exit 0
+      - name: Non-terraform change, or terraform apply failed
+        if: failure() || steps.workflow-or-terraform-change.outcome != 'success'
+        run: exit 1
+
+  merge-into-master:
+    if: ${{ always() && (needs.tf-apply.result == 'success' || needs.tf-apply.result == 'skipped') }}
+    needs: [tf-apply, completed]
+    uses: guidion-digital/release-workflows/.github/workflows/github-merge-into-master.yaml@v2
+    with:
+      branch: ${{ github.ref_name }}
+    permissions:
+      contents: write
+
+  release-tag:
+    if: ${{ needs.tf-apply.result == 'success' && needs.merge-into-master.result == 'success' }}
+    needs: [tf-apply, merge-into-master]
+    uses: guidion-digital/release-workflows/.github/workflows/github-release-tag.yaml@v2
+    with:
+      branch: ${{ github.ref_name }}
+    permissions:
+      contents: write
