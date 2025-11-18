@@ -17,10 +17,18 @@ on:
         type: boolean
         default: true
       environment:
-        description: Github environment to attach with extra variables
+        description: Github environment to attach
         required: false
         type: string
         default: ""
+      environment_variables:
+        description: Variables to set in the environment (KEY=value format)
+        required: false
+        type: string
+    secrets:
+      environment_secrets:
+        description: Secrets to set in the environment (KEY=value format)
+        required: false
     outputs:
       terraform-file-changes-result:
         description: "Output from terraform-file-changes GH Actions"
@@ -62,13 +70,17 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ vars.MODULE_TESTER_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.MODULE_TESTER_AWS_SECRET_ACCESS_KEY }}
-      # TF_VAR_checkly_account_id: ${{ vars.TF_VAR_CHECKLY_ACCOUNT_ID }}
-      # TF_VAR_checkly_api_key: ${{ secrets.TF_VAR_CHECKLY_API_KEY }}
+      ENVIRONMENT_VARIABLES: ${{ inputs.environment_variables }}
+      ENVIRONMENT_SECRETS: ${{ secrets.environment_secrets }}
     defaults:
       run:
         working-directory: ${{ matrix.tf_examples_dirs }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
     steps:
+      - name: Load variables from caller
+        run: |
+          echo "$ENVIRONMENT_VARIABLES" >> $GITHUB_ENV
+          echo "$ENVIRONMENT_SECRETS" >> $GITHUB_ENV
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: See env values
