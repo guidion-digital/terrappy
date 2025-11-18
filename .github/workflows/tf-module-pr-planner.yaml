@@ -77,12 +77,12 @@ jobs:
         working-directory: ${{ matrix.tf_examples_dirs }}
     container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Load variables from caller
         run: |
           echo "$ENVIRONMENT_VARIABLES" >> $GITHUB_ENV
           echo "$ENVIRONMENT_SECRETS" >> $GITHUB_ENV
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - name: See env values
         run: printenv
       - name: Terraform init
