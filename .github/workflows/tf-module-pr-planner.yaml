@@ -96,7 +96,7 @@ jobs:
           echo "$ENVIRONMENT_SECRETS" >> "$GITHUB_ENV"
       - name: Terraform init
         run: terraform init
-      - name: Run terraform plan with auto-approval
+      - name: Run terraform plan
         run: terraform plan
   # This is needed because matrix tests have dynamic workflow names based on the
   # folder name. This is something we cannot make a required test from. Because
