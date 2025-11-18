@@ -79,8 +79,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Load variables from caller
         run: |
-          echo "$ENVIRONMENT_VARIABLES" >> $GITHUB_ENV
-          echo "$ENVIRONMENT_SECRETS" >> $GITHUB_ENV
+          echo "$ENVIRONMENT_VARIABLES" >> "$GITHUB_ENV"
+          echo "$ENVIRONMENT_SECRETS" >> "$GITHUB_ENV"
       - name: Terraform init
         run: terraform init
       - name: Run terraform apply with auto-approval
