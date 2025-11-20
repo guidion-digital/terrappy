@@ -93,7 +93,7 @@ jobs:
   # skipped tests are marked as succesfull in GitHub required test, we test here
   # if it was succesfully run and then mark it as such, if it's skipped or fails
   # then it's marked as failed.
-  completed:
+  tf-apply-completed:
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     needs: [terraform-file-changes, tf-apply]
@@ -110,7 +110,7 @@ jobs:
 
   merge-into-master:
     if: ${{ always() && (needs.tf-apply.result == 'success' || needs.tf-apply.result == 'skipped') }}
-    needs: [tf-apply, completed]
+    needs: [tf-apply, tf-apply-completed]
     uses: guidion-digital/release-workflows/.github/workflows/github-merge-into-master.yaml@v2
     with:
       branch: ${{ github.ref_name }}
