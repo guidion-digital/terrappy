@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage/
+.npmrc
+.DS_Store
+config/local.json
+.terraform
+.terraform.lock.hcl
+terraform.tfstate*
+*.tfvars
+backend.tf
