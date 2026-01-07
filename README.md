@@ -49,6 +49,10 @@ Finally, we have the application modules which are the ultimate point for all th
 
 [TFCD](https://github.com/GuidionOps/terraform-cloud-deployer) is a CLI utility designed to provide low-level commands to TFC. It was used in the first iteration of Terrappy, before migrating to `terraform` commands, but is still used by the Terrappy Github workflow (see below) for it's `cancel` command — though this will be unecessary in a future version.
 
+## Preparation Script
+
+To help with the set up of a properly configured backend, a [prepare script](./prepare_terraform_backend.sh) is provided. Read about how it works [here](prepare-script.md)
+
 ## CICD
 
 There is a reusable [Github Actions workflow](./cicd.md) which you can plug into your existing workflows.
