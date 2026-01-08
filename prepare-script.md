@@ -34,11 +34,14 @@ Please provde one of these for the 'workspace' name as the second argument:
 
 ## Sub-namespacing
 
-If `namespaced` is given as a value, the user's username will be used as a suffix for:
+If `namespaced` is given as a value to the third parameter, the user's username will be used as a suffix for:
 
 - The `name_suffix` variable (it will be inserted into `terraform.tfvars`)
 - The Terraform workspace (non-TFC) will be switched to this namespace (created if non-existent)
 
-This is useful where you wish to deploy the same application in the same AWS account, e.g. for development teams working on the same application at the same time.
+This is useful where you wish to deploy the same application in the same AWS account, e.g. for development teams working on the same application at the same time. Of course, the Terraform module must support this by accepting `var.name_suffix` for sub-namespacing (tip: The API Lambda module can be safely configured with this variable set to `null`, so you can have that as a default value).
 
 You must ensure that the IAM policies for the application still work for the namespaced resources. For example, if you had policies allowing operations on `arn:aws:ssm:eu-central-1:012345678901:parameter/applications/foobar`, (where "foobar" was your application name) it will now have to be `arn:aws:ssm:eu-central-1:012345678901:parameter/applications/foobar-*`.
+
+> [!WARNING] Switching between namespaced and non-namespaced instances
+> When switching back to a "shared" deployed instance, you must remember to run the script again, _without_ the third argument. This will ensure you are in the correct workspace, and also remove the value for `name_suffix` so that it defaults back to `null` (if you have set a default for it)
