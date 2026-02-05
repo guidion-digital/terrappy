@@ -49,8 +49,8 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ vars.MODULE_TESTER_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.MODULE_TESTER_AWS_SECRET_ACCESS_KEY }}
-      TF_VAR_CHECKLY_ACCOUNT_ID: $${{ vars.CHECKLY_ACCOUNT_ID }}
-      TF_VAR_CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+      TF_VAR_checkly_account_id: $${{ vars.CHECKLY_ACCOUNT_ID }}
+      TF_VAR_checkly_api_key: ${{ secrets.CHECKLY_API_KEY }}
     defaults:
       run:
         working-directory: ${{ matrix.tf_examples_dirs }}
