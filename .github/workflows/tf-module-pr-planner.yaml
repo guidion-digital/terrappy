@@ -1,18 +1,5 @@
 name: Test PRs by running Terraform plans
 
-# Pass secrets and variables to be set in the environment with inputs.environment_variables
-# and secrets.environment_secrets. Both must have items set on newlines, like so:
-#
-# with:
-#   environment_variables: |
-#     EXAMPLE_VARIABLE=${{ vars.example_variable }}
-# secrets:
-#   environment_secrets: |
-#     EXAMPLE_SECRET=${{ secrets.example_secret }}
-#
-# Do not pass secrets down as plaintext values, but rather references to Github
-# secrets, as in the example above. Variables can be passed as plain text
-
 # N.B. When relying on this workflow as a required check, you must use the
 # exact name: '[YOUR JOB NAME] / completed'
 
@@ -34,14 +21,6 @@ on:
         required: false
         type: string
         default: ""
-      environment_variables:
-        description: Variables to set in the environment (KEY=value format)
-        required: false
-        type: string
-    secrets:
-      environment_secrets:
-        description: Secrets to set in the environment (KEY=value format)
-        required: false
     outputs:
       terraform-file-changes-result:
         description: "Output from terraform-file-changes GH Actions"
@@ -81,8 +60,10 @@ jobs:
       fail-fast: false
     environment: ${{ inputs.environment }}
     env:
-      ENVIRONMENT_VARIABLES: ${{ inputs.environment_variables }}
-      ENVIRONMENT_SECRETS: ${{ secrets.environment_secrets }}
+      AWS_ACCESS_KEY_ID: ${{ vars.MODULE_TESTER_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.MODULE_TESTER_AWS_SECRET_ACCESS_KEY }}
+      CHECKLY_ACCOUNT_ID: $${{ vars.CHECKLY_ACCOUNT_ID }}
+      CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
     defaults:
       run:
         working-directory: ${{ matrix.tf_examples_dirs }}
@@ -90,10 +71,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Load variables from caller
-        run: |
-          echo "$ENVIRONMENT_VARIABLES" >> "$GITHUB_ENV"
-          echo "$ENVIRONMENT_SECRETS" >> "$GITHUB_ENV"
       - name: Terraform init
         run: terraform init
       - name: Run terraform plan
