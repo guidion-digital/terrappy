@@ -3,6 +3,11 @@ name: Release a version of a module if the terraform apply passes
 on:
   workflow_call:
     inputs:
+      tfc_deployer_container_version:
+        description: Version tag for the Terraform Cloud deployer container image
+        required: false
+        type: string
+        default: 0.1.1
       tf_examples_dirs:
         description: List of directories to test (JSON array format)
         required: false
@@ -54,7 +59,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ matrix.tf_examples_dirs }}
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.1
+    container: ghcr.io/guidionops/terraform-cloud-deployer:${{ inputs.tfc_deployer_container_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
