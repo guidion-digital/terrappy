@@ -1,6 +1,11 @@
 on:
   workflow_call:
     inputs:
+      tfc_deployer_container_version:
+        description: Version tag for the Terraform Cloud deployer container image
+        required: false
+        type: string
+        default: 0.1.0
       tfc_organization:
         description: Name of the TFC organization you're deploying to
         required: false
@@ -76,7 +81,7 @@ jobs:
   tf-init:
     needs: build
     runs-on: ubuntu-latest
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
+    container: ghcr.io/guidionops/terraform-cloud-deployer:${{ inputs.tfc_deployer_container_version }}
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -111,7 +116,7 @@ jobs:
   tf-test:
     needs: tf-init
     runs-on: ubuntu-latest
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
+    container: ghcr.io/guidionops/terraform-cloud-deployer:${{ inputs.tfc_deployer_container_version }}
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
@@ -131,7 +136,7 @@ jobs:
   tf-plan:
     needs: tf-init
     runs-on: ubuntu-latest
-    container: ghcr.io/guidionops/terraform-cloud-deployer:0.1.0
+    container: ghcr.io/guidionops/terraform-cloud-deployer:${{ inputs.tfc_deployer_container_version }}
     steps:
       - name: Get the build artifacts and Terraform files
         uses: actions/download-artifact@v4
