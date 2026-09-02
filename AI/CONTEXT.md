@@ -1,10 +1,10 @@
 ---
 repo: guidion-digital/terrappy
 project_name: terrappy
-owner: UNSET — please set this
+owner: Cinfra
 domain: Terraform and CI/CD automation
 criticality: UNSET
-summary: Terrappy provides documentation and shell automation for preparing Terraform backends and related CI/CD workflows.
+summary: Describes the Terraform framework used at Guidion and provides documentation and shell automation for preparing Terraform backends and related CI/CD workflows.
 main_stack:
   - Shell
   - Markdown
@@ -15,12 +15,12 @@ main_systems:
 last_reviewed: 2026-09-02
 review_confidence: low
 generated_by: OpenAI
-validated_by: UNSET
+validated_by: Afraz
 ---
 
 ## Overview
 
-Terrappy is a small repository containing documentation and a shell script for preparing a Terraform backend. The available repository structure does not include application source code or Terraform configuration files.
+Describes the Terraform framework called "Terrappy", used by Guidion. Contains documentation and a shell scripts for preparing a Terraform backend for use with Terrappy. The available repository structure does not include application source code or Terraform configuration files.
 
 ## Purpose and responsibilities
 
