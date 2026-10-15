@@ -30,7 +30,8 @@ jobs:
           TF_TOKEN_app_terraform_io: ${{ secrets.tfc_planner_api_token }}
       - uses: reviewdog/action-tflint@v1
         with:
-          reporter: github-pr-review
+          # Push runs have no pull request; report their findings as annotations.
+          reporter: ${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-annotations' }}
           fail_level: ${{ inputs.fail_level }}
           tflint_config: "" # Needed because default is set to config file, tflint 0.50 fails if config is supplied but can't be found.
           filter_mode: "nofilter"
