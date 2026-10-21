@@ -1,0 +1,36 @@
+name: AWS Integration Tests
+
+on:
+  push:
+    branches: [chore/bootstrap-ai-context]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Start MiniStack (Fake AWS Cloud)
+        run: docker run -d -p 4566:4566 ministackorg/ministack
+      - name: Wait for MiniStack to be ready
+        run: |
+          echo 'Waiting for MiniStack...'
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:4566/_ministack/health && exit 0
+            sleep 2
+          done
+          echo 'MiniStack did not become ready within 60 seconds'
+          docker logs $(docker ps -lq)
+          exit 1
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform init
+        working-directory: examples/test_app
+        run: terraform init -input=false
+      - name: Terraform validate
+        working-directory: examples/test_app
+        run: terraform validate
+      - name: Terraform apply
+        working-directory: examples/test_app
+        run: terraform apply -input=false -auto-approve
