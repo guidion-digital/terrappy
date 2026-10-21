@@ -4,7 +4,8 @@ on:
       environment_name:
         description: The Github environment to deploy to.
         type: string
-        default: "ministack"
+        # TODO: Rename these environments to ministack
+        default: "localstack"
     outputs:
       terraform-file-changes-result:
         description: "Output from terraform-file-changes GH Actions"
