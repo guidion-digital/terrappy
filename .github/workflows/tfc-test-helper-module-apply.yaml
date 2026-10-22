@@ -20,7 +20,7 @@ jobs:
     outputs:
       result: ${{ steps.terraform-file-changes.outputs.terraform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v3
         id: terraform-file-changes
         with:
@@ -33,7 +33,7 @@ jobs:
     if: ${{ needs.terraform-file-changes.outputs.result == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - id: set-matrix
         working-directory: ./examples
         run: echo "matrix=$(find -- * -type d | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
@@ -49,7 +49,7 @@ jobs:
         folders: ${{ fromJson(needs.get-matrix-directories.outputs.matrix) }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Start MiniStack (Fake AWS Cloud)
         run: docker run -d -p 4566:4566 ministackorg/ministack
       - name: Wait for MiniStack to be ready
