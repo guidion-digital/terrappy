@@ -35,6 +35,11 @@ jobs:
   ministack-plan:
     needs: get-matrix-directories
     runs-on: ubuntu-latest
+    env:
+      AWS_ENDPOINT_URL: http://localhost:4566
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: eu-central-1
     strategy:
       matrix:
         folders: ${{ fromJson(needs.get-matrix-directories.outputs.matrix) }}
@@ -47,7 +52,7 @@ jobs:
         run: |
           echo 'Waiting for MiniStack...'
           for i in $(seq 1 30); do
-            curl -sf http://localhost:4566/_ministack/health && exit 0
+            curl -sf "$AWS_ENDPOINT_URL/_ministack/health" && exit 0
             sleep 2
           done
           echo 'MiniStack did not become ready within 60 seconds'
