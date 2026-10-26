@@ -10,8 +10,17 @@ on:
       terraform-file-changes-result:
         description: "Output from terraform-file-changes GH Actions"
         value: ${{ jobs.terraform-file-changes.outputs.result }}
+      ministack-apply-result:
+        description: "Result of the MiniStack apply job ('success', 'failure', 'skipped' or 'cancelled')"
+        value: ${{ jobs.completed.outputs.ministack-apply-result }}
+      # DEPRECATED: Use ministack-apply-result. Kept so that callers written for the LocalStack
+      # version of this workflow keep gating their releases correctly
+      local-stack-apply-result:
+        description: "DEPRECATED: Use ministack-apply-result"
+        value: ${{ jobs.completed.outputs.ministack-apply-result }}
+      # DEPRECATED: Use ministack-apply-result. Briefly published under this name in v3
       mini-stack-apply-result:
-        description: "Output wether job is is succesful or not"
+        description: "DEPRECATED: Use ministack-apply-result"
         value: ${{ jobs.completed.outputs.ministack-apply-result }}
 
 jobs:
